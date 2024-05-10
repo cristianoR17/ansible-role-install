@@ -1,0 +1,19 @@
+#!/usr/bin/php -q
+<?php
+require 'phpagi.php';
+
+$agi = new AGI(); //instanciando objeto
+
+
+//Verificando o valor da variável passada pelo AGI e passando para contexto
+
+//ob_implicit_flush(true);
+//set_time_limit(30);
+
+$id = $agi->get_variable('ID');
+$id = $id['data'];
+$id="a";
+$agi->noop($id);
+
+?>
+

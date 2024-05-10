@@ -1,0 +1,17 @@
+M_00001 --> Login de agente. Por favor entre com seu número de agente e em seguida tecle quadrado.
+M_00002 --> Por favor, entre com a sua senha e em seguida a tecla quadrado.
+M_00003 --> Login incorreto. Por favor entre com seu número de agente e em seguida quadrado.
+M_00004 --> Agente logado.
+M_00005 --> Agente deslogado.
+M_00006 --> Agente deslogado.
+M_00007 --> Operador ja em pausa.
+M_00008 --> Por favor aguarde.
+M_00009 --> Programação aceita.
+M_00010 --> Operador não logado ou não associado a uma campanha.
+M_00011 --> Número ocupado.
+M_00012 --> Linha não atende
+M_00013 --> Número bloqueado para chamadas do tipo ativa
+
+
+
+

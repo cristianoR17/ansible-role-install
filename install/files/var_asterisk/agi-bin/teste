@@ -1,0 +1,14 @@
+total 224
+-rw-r--r--  1 root root   1481 2007-03-09 18:34 1
+-rwxr-xr-x  1 root root   2272 2007-03-29 16:03 agente_eventos.agi
+-rwxr-xr-x  1 root root   2117 2007-03-29 17:11 agente_eventos_eof.agi
+-rwxr-xr-x  1 root root   2096 2007-03-29 18:00 agente_eventos_logout.agi
+-rwxr-xr-x  1 root root   1742 2007-03-02 12:04 agi-test.agi
+-rwxr-xr-x  1 root root   1775 2007-03-12 19:42 campanha.agi
+-rwxr-xr-x  1 root root   1917 2007-03-13 13:49 campanha_cdr.agi
+-rwxr-xr-x  1 root root   1481 2007-03-09 20:08 consulta.agi
+-rwxr-xr-x  1 root root 104071 2007-03-02 12:04 eagi-sphinx-test
+-rwxr-xr-x  1 root root  73327 2007-03-02 12:04 eagi-test
+-rwxr-xr-x  1 root root   2095 2007-03-29 11:03 hora_fila_cdr.agi
+-rwxr-xr-x  1 root root   1878 2007-03-13 16:33 link_grav.agi
+-rw-r--r--  1 root root      0 2007-03-29 19:28 teste

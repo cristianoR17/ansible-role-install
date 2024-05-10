@@ -1,0 +1,94 @@
+---
+# tasks file for roles/install
+- name: removendo arquivos do diretorio extend
+  file: 
+    path: /home/extend
+    state: absent
+
+- name: synchronize files
+  synchronize:  
+    src: files/extend
+    dest: /home/
+    
+- name: listando arquivos 
+  ansible.builtin.command: ls -lha /home/
+  register: log_files
+
+- name: Output list of log files
+  ansible.builtin.debug:
+    var: log_files.stdout_lines        
+
+- name: Ajustar crontab
+  copy: src=root dest=/var/spool/cron/crontabs/
+  notify:
+    - Restarting cron
+
+- name: Ajustar arquivos restard.conf
+  copy: src=restartd.conf dest=/etc/
+  notify:
+    - Restarting restard 
+
+#
+- name: store all of the files and directories at the /etc/asterisk in the 'out' variable
+  find:
+    paths: /etc/asterisk
+    patterns: (?i).*
+    use_regex: true
+  register: out
+
+- name: remove files in the /etc/asterisk
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ out.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+#
+- name: Copy all file to /etc/asterisk
+  copy:
+    src: "{{ item }}"
+    dest: /etc/asterisk/
+  with_fileglob:
+    - "etc_asterisk/*"
+
+- name: store all of the files and directories at the /var/www/comunix/ in the 'out' variable
+  find:
+    paths: /var/www/comunix
+    patterns: (?i).*transfer*
+    use_regex: true
+  register: out
+
+- name: remove files in the /var/www/comunix/
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ out.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+#
+- name: Copy all file to /var/www/comunix/
+  copy:
+    src: "{{ item }}"
+    dest: /var/www/comunix/
+  with_fileglob:
+    - "www_comunix/transfer*"
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: /home/gravacoes/ativo
+    state: directory
+    mode: '0644'
+
+- name: Genereation template
+  template:
+    src: comunix.conf
+    dest: /home/extend/  
+
+- name: Stop asterisk
+  ansible.builtin.command: /etc/init.d/asterisk stop
+
+- name: Start asterisk
+  ansible.builtin.command: /etc/init.d/asterisk start
+

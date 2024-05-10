@@ -1,0 +1,131 @@
+#!/usr/bin/php5 -q
+<?php
+require('/var/lib/asterisk/agi-bin/conexao.php');
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+// Funcao que conecta ao banco de dados
+
+function conectar($host, $port, $db, $usuario, $senha){
+$conn = "host=".$host." port=".$port." dbname=".$db." user=".$usuario." password=".$senha;
+$acesso = pg_connect($conn) or die("O Servidor de Banco de Dados nao está disponível --> " . pg_last_error($conn)); 
+}
+
+conectar(HOST, PORT, DBASE, USER, PASS);
+
+write("GET VARIABLE COD");
+$c = read();
+$cd_campanha = substr($c,14);
+$cd_campanha = substr($cd_campanha,0,-1);
+
+write("GET VARIABLE ID");
+$c = read();
+$cd_chamada = substr($c,14);
+$cd_chamada = substr($cd_chamada,0,-1);
+
+write("GET VARIABLE FILA");
+$c = read();
+$cd_fila = substr($c,14);
+$cd_fila = substr($cd_fila,0,-1);
+
+
+write("GET VARIABLE CLID");
+$c = read();
+$clid = substr($c,14);
+$clid = substr($clid,0,-1);
+
+$cod_menu = $cd_menu.$cd_opcao;
+
+write("GET VARIABLE IDURA");
+$c = read();
+$idura = substr($c,14);
+$idura = substr($idura,0,-1);
+
+write("GET VARIABLE CH");
+$c = read();
+$ch = substr($c,14);
+$ch = substr($ch,0,-1);
+
+write("GET VARIABLE CD_AGENTE");
+$c = read();
+$cd_agente = substr($c,14);
+$cd_agente = substr($cd_agente,0,-1);
+
+if ($cd_fila=='q0000')
+{
+$query = "insert into opcao_fila (uniqueid,cd_fila,clid,cd_campanha,cd_agente) values('99$cd_chamada','$cd_fila','$clid',$cd_campanha,$cd_agente)";
+echo "VERBOSE \"SQL $query\" \n";
+$query_result = pg_query($query) or die("ERRO");
+//$result = pg_fetch_result($query_result,0,'cd_campanha');
+//echo "VERBOSE \" $result \" \n";
+//echo ("SET VARIABLE CAMP '$result'");
+fclose($in);
+fclose($stdlog);
+exit;
+}
+
+if ($cd_fila=='q0001')
+{
+$query = "insert into opcao_fila (uniqueid,cd_fila,clid) values('$cd_chamada','$cd_fila','$clid')";
+$query_result = pg_query($query) or die("ERRO");
+//$result = pg_fetch_result($query_result,0,'cd_campanha');
+//echo "VERBOSE \" $result \" \n";
+echo "VERBOSE \" $query\" \n";
+//echo ("SET VARIABLE CAMP '$result'");
+fclose($in);
+fclose($stdlog);
+exit;
+}
+
+
+//ransferencia de operador
+if (substr($ch,0,5)=="SIP/4") 
+ $clid=substr($ch,4,6);
+
+//Transferencia de supervisor
+if (substr($ch,0,5)=="SIP/5")
+ $clid=substr($ch,4,6);
+
+$query = "insert into opcao_fila (uniqueid,cd_fila,clid,uniqueid_ura) values('$cd_chamada','$cd_fila','$clid','$idura')";
+$query_result = pg_query($query) or die("ERRO");
+//$result = pg_fetch_result($query_result,0,'cd_campanha');
+//echo "VERBOSE \" $result \" \n";
+echo "VERBOSE \" $query\" \n";
+//echo ("SET VARIABLE CAMP '$result'");
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

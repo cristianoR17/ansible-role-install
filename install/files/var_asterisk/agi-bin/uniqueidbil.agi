@@ -1,0 +1,23 @@
+#!/usr/bin/php -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0);
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+$idbil = $argv[1];
+
+$uniqueidbil = system("cat /dev/shm/idbil/$idbil");
+$uniqueidbil = trim($uniqueidbil);
+
+
+echo("SET VARIABLE UNIQUEIDBIL $uniqueidbil\n");
+
+
+exit;
+
+?>
+

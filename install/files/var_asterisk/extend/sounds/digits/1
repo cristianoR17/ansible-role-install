@@ -1,0 +1,575 @@
+[general]
+
+static=yes
+writeprotect=yes
+autofallthrough=no
+clearglobalvars=no
+proorityjumping=no
+
+[globals]
+ 
+
+[default]
+
+;Eventos de login e logout
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+;Login
+exten => *71,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *71,2,Set(COD_EVENTO=71)
+exten => *71,3,Set(DT_I=${TIMESTAMP})
+exten => *71,4,agi(agente_eventos_logout.agi)
+exten => *71,5,agi(agente_eventos.agi)
+exten => *71,6,AgentCallBackLogin(${CHANNEL:4:6}|${CHANNEL:4:6}|${CALLERIDNUM})
+exten => *71,7,UnPauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *71,8,Hangup
+
+;Logout
+exten => *85,1,Answer()
+exten => *85,2,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *85,3,Set(DT_I=${TIMESTAMP})
+exten => *85,4,Set(COD_EVENTO=71)
+exten => *85,5,agi(agente_eventos_logout.agi)
+exten => *85,6,agi(agente_eventos_unpause.agi)
+exten => *85,7,System(asterisk -rx "agent logoff Agent/${CHANNEL:4:6}")
+exten => *85,8,PlayBack(prog_aceita)
+exten => *85,9,Hangup
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+exten => *72,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *72,2,Set(COD_EVENTO=72)
+exten => *72,3,Set(DT_I=${TIMESTAMP})
+exten => *72,4,agi(agente_eventos_unpause.agi)
+exten => *72,5,agi(agente_eventos_pause.agi)
+exten => *72,6,agi(agente_eventos.agi)
+exten => *72,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *72,8,PlayBack(prog_aceita)
+
+exten => *73,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *73,2,Set(COD_EVENTO=73)
+exten => *73,3,Set(DT_I=${TIMESTAMP})
+exten => *73,4,agi(agente_eventos_unpause.agi)
+exten => *73,5,agi(agente_eventos_pause.agi)
+exten => *73,6,agi(agente_eventos.agi)
+exten => *73,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *73,8,PlayBack(prog_aceita)
+
+exten => *74,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *74,2,Set(COD_EVENTO=74)
+exten => *74,3,Set(DT_I=${TIMESTAMP})
+exten => *74,4,agi(agente_eventos_unpause.agi)
+exten => *74,5,agi(agente_eventos_pause.agi)
+exten => *74,6,agi(agente_eventos.agi)
+exten => *74,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *74,8,PlayBack(prog_aceita)
+
+exten => *75,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *75,2,Set(COD_EVENTO=75)
+exten => *75,3,Set(DT_I=${TIMESTAMP})
+exten => *75,4,agi(agente_eventos_unpause.agi)
+exten => *75,5,agi(agente_eventos_pause.agi)
+exten => *75,6,agi(agente_eventos.agi)
+exten => *75,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *75,8,PlayBack(prog_aceita)
+
+exten => *76,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *76,2,Set(COD_EVENTO=76)
+exten => *76,3,Set(DT_I=${TIMESTAMP})
+exten => *76,4,agi(agente_eventos_unpause.agi)
+exten => *76,5,agi(agente_eventos_pause.agi)
+exten => *76,6,agi(agente_eventos.agi)
+exten => *76,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *76,8,PlayBack(prog_aceita)
+
+exten => *77,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *77,2,Set(COD_EVENTO=77)
+exten => *77,3,Set(DT_I=${TIMESTAMP})
+exten => *77,4,agi(agente_eventos_unpause.agi)
+exten => *77,5,agi(agente_eventos_pause.agi)
+exten => *77,6,agi(agente_eventos.agi)
+exten => *77,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *77,8,PlayBack(prog_aceita)
+
+exten => *78,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *78,2,Set(COD_EVENTO=78)
+exten => *78,3,Set(DT_I=${TIMESTAMP})
+exten => *78,4,agi(agente_eventos_unpause.agi)
+exten => *78,5,agi(agente_eventos_pause.agi)
+exten => *78,6,agi(agente_eventos.agi)
+exten => *78,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *78,8,PlayBack(prog_aceita)
+
+exten => *79,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *79,2,Set(COD_EVENTO=79)
+exten => *79,3,Set(DT_I=${TIMESTAMP})
+exten => *79,4,agi(agente_eventos_unpause.agi)
+exten => *79,5,agi(agente_eventos_pause.agi)
+exten => *79,6,agi(agente_eventos.agi)
+exten => *79,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *79,8,PlayBack(prog_aceita)
+
+exten => *80,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *80,2,Set(COD_EVENTO=80)
+exten => *80,3,Set(DT_I=${TIMESTAMP})
+exten => *80,4,agi(agente_eventos_unpause.agi)
+exten => *80,5,agi(agente_eventos_pause.agi)
+exten => *80,6,agi(agente_eventos.agi)
+exten => *80,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *80,8,PlayBack(prog_aceita)
+
+exten => *81,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *81,2,Set(COD_EVENTO=81)
+Exten => *81,3,Set(DT_I=${TIMESTAMP})
+exten => *81,4,agi(agente_eventos_unpause.agi)
+exten => *81,5,agi(agente_eventos_pause.agi)
+exten => *81,6,agi(agente_eventos.agi)
+exten => *81,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *81,8,PlayBack(prog_aceita)
+
+exten => *82,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *82,2,Set(COD_EVENTO=82)
+exten => *82,3,Set(DT_I=${TIMESTAMP})
+exten => *82,4,agi(agente_eventos_unpause.agi)
+exten => *82,5,agi(agente_eventos_pause.agi)
+exten => *82,6,agi(agente_eventos.agi)
+exten => *82,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *82,8,PlayBack(prog_aceita)
+
+exten => *83,1,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *83,2,Set(COD_EVENTO=83)
+exten => *83,3,Set(DT_I=${TIMESTAMP})
+exten => *83,4,agi(agente_eventos_unpause.agi)
+exten => *83,5,agi(agente_eventos_pause.agi)
+exten => *83,6,agi(agente_eventos.agi)
+exten => *83,7,PauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *83,8,PlayBack(prog_aceita)
+
+;Tirar da pausa
+exten => *84,1,Answer()
+exten => *84,2,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *84,3,Set(DT_I=${TIMESTAMP})
+exten => *84,4,agi(agente_eventos_unpause.agi)
+exten => *84,5,UnPauseQueueMember(|Agent/${CHANNEL:4:6})
+exten => *84,6,PlayBack(prog_aceita)
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Ligacoes internas entre agentes
+exten => _4.,1,Set(CALLFILENAME3=/var/www/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${EXTEN}/)
+exten => _4.,2,Set(CALLFILENAME4=${CALLFILENAME3}${TIMESTAMP:9:10}-${EXTEN})
+exten => _4.,3,Monitor(wav49,${CALLFILENAME4},m)
+exten => _4.,4,Dial(SIP/${EXTEN},60)
+exten => _4.,5,Hangup
+;///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+;Cifras externas
+;/////////////////////////////////////////////////////////////////////////////////////////////////////
+;Ramal DDR 3486-9001
+exten => 9001,1,Dial(SIP/9001)
+
+;Servico DAC Boa Vista Energia 
+
+exten => 9090,1,Answer()
+exten => 9090,2,SetLanguage(pt)
+exten => 9090,3,SayNumber(10265)
+exten => 9090,4,PlayBack(reais)
+;exten => 9090,2,agi(consulta.agi)
+exten => 9090,5,Hangup()
+exten => 9191,1,Answer()
+exten => 9191,2,PlayBack(teste)
+
+exten => 9120,1,Answer()
+exten => 9120,2,Playback(boavista)
+exten => 9120,3,Set(hr_inicial=${TIMESTAMP})
+exten => 9120,4,Set(ID=${UNIQUEID})
+exten => 9120,5,Set(HR_I=${hr_inicial})
+exten => 9120,6,agi(hora_fila_cdr.agi)
+exten => 9120,7,Queue(boavista|tThH|||3000)
+
+;Servico de FAX 3486-9690
+exten => 9690,1,Dial(dgv/G1/30355190)
+
+;Servico bancorbras
+exten => 9200,1,Answer()
+exten => 9200,2,Set(ID=${UNIQUEID})
+exten => 9200,3,Set(HR_I=${hr_inicial})
+exten => 9200,4,GotoIfTime(8:00-21:00|sun-sat|*|*?bancorbras,s,1)
+exten => 9200,5,Hangup
+
+exten => 9200,4,Queue(bancorbras|tThH|||3000)
+
+;Servico cartao cimfel
+exten => 9030,1,Answer()
+exten => 9030,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9030,3,GotoIfTime(8:00-20:00|sun-sat|*|*?cimfel,s,1)
+exten => 9030,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9030,5,Hangup
+
+;Posto sorriso
+exten => 9031,1,Answer()
+exten => 9031,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9031,3,GotoIfTime(8:00-23:00|sun-sat|*|*?postosorriso,s,1)
+exten => 9031,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9031,5,Hangup
+
+;Pirenopolis
+exten => 9032,1,Answer()
+exten => 9032,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9032,3,GotoIfTime(8:00-20:00|sun-sat|*|*?pirenopolis,s,1)
+exten => 9032,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9032,5,Hangup
+
+;Drogaria Rosario
+exten => 9033,1,Answer()
+exten => 9033,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9033,3,GotoIfTime(8:00-20:00|sun-sat|*|*?drogariarosario,s,1)
+exten => 9033,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9033,5,Hangup
+
+;Polyelle
+exten => 9034,1,Answer()
+exten => 9034,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9034,3,GotoIfTime(8:00-23:59|sun-sat|*|*?polyelle,s,1)
+exten => 9034,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9034,5,Hangup
+
+;Bom Motivo
+exten => 9035,1,Answer()
+exten => 9035,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9035,3,GotoIfTime(8:00-20:00|sun-sat|*|*?bommotivo,s,1)
+exten => 9035,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9035,5,Hangup
+
+;Gasoline
+exten => 9036,1,Answer()
+exten => 9036,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9036,3,GotoIfTime(8:00-20:00|sun-sat|*|*?gasoline,s,1)
+exten => 9036,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9036,5,Hangup
+
+;Super Maia
+exten => 9037,1,Answer()
+exten => 9037,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9037,3,GotoIfTime(8:00-20:00|sun-sat|*|*?supermaia,s,1)
+exten => 9037,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9037,5,Hangup
+
+;Gasol
+exten => 9038,1,Answer()
+exten => 9038,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9038,3,GotoIfTime(8:00-20:00|sun-sat|*|*?gasol,s,1)
+exten => 9038,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9038,5,Hangup
+
+;Tesoura de ouro
+exten => 9039,1,Answer()
+exten => 9039,2,Set(hr_inicial=${TIMESTAMP}) 
+exten => 9039,3,GotoIfTime(8:00-20:00|sun-sat|*|*?tesoura,s,1)
+exten => 9039,4,PlayBack(cartaobrb_fora_do_horario)
+exten => 9039,5,Hangup
+
+;supervisor cartao brb 
+[1006]
+include => default
+include => 1005
+
+;comandos dos supervisores
+;///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Logout agente
+exten => _*91.,1,Answer()
+exten => _*91.,2,Set(COD_AGENTE=${EXTEN:3})
+exten => _*91.,3,Set(DT_I=${TIMESTAMP})
+exten => _*91.,4,agi(agente_eventos_logout.agi)
+exten => _*91.,5,System(asterisk -rx "agent logoff Agent/${EXTEN:3}")
+exten => _*91.,6,PlayBack(prog_aceita)
+exten => _*91.,7,Hangup
+
+;Pausar agente
+exten => _*92.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*92.,2,Set(COD_EVENTO=72)
+exten => _*92.,3,Set(DT_I=${TIMESTAMP})
+exten => _*92.,4,agi(agente_eventos_unpause.agi)
+exten => _*92.,5,agi(agente_eventos_pause.agi)
+exten => _*92.,6,agi(agente_eventos.agi)
+exten => _*92.,7,PauseQueueMember(|Agent/${EXTEN:3})
+exten => _*92.,8,PlayBack(prog_aceita)
+
+;Tirar agente da pausa
+exten => _*93.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*93.,2,Set(DT_I=${TIMESTAMP})
+exten => _*93.,3,agi(agente_eventos_unpause.agi)
+exten => _*93.,4,UnPauseQueueMember(|Agent/${EXTEN:3})
+Exten => _*93.,5,PlayBack(prog_aceita)
+
+;Monitorar agente
+exten => _*94.,1,chanspy(agent/${EXTEN:3})
+
+;Monitorar ramal
+exten => _*95.,1,chanspy(SIP/${EXTEN:3})
+
+;///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+;Operador cartao brb 
+[1005]
+include => default
+
+;Ligacoes pela rota 0
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Ligacoes locais / DDD / DDI
+exten => _0[0-9].,1,Answer
+exten => _0[0-9].,2,Set(OPCAO=${CHANNEL:4:6})
+exten => _0[0-9].,3,agi(campanha.agi)
+exten => _0[0-9].,4,GotoIf($["${CAMP:1:4}" = "9999"]?14:5))
+exten => _0[0-9].,5,Set(COD=${CAMP:1:4})
+exten => _0[0-9].,6,Set(ID=${UNIQUEID})
+exten => _0[0-9].,7,agi(campanha_cdr.agi)
+exten => _0[0-9].,8,Set(CALLFILENAME1=/var/www/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/)
+exten => _0[0-9].,9,Set(CALLFILENAME2=${CALLFILENAME1}${TIMESTAMP:9:10}-${EXTEN:1})
+exten => _0[0-9].,10,Set(LI=http://localhost/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/${TIMESTAMP:9:10}-${EXTEN:1}.WAV)
+exten => _0[0-9].,11,agi(link_grav.agi)
+exten => _0[0-9].,12,Monitor(wav49,${CALLFILENAME2},m)
+exten => _0[0-9].,13,Dial(Dgv/g1/${EXTEN:1},60,tT)
+exten => _0[0-9].,14,Hangup
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Operador MDS 
+[1009]
+include => default
+
+;Ligacoes pela rota 0
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Ligacoes locais / DDD / DDI
+exten => _0[0-9].,1,Answer
+exten => _0[0-9].,2,Set(OPCAO=${CHANNEL:4:6})
+exten => _0[0-9].,3,agi(campanha.agi)
+exten => _0[0-9].,4,GotoIf($["${CAMP:1:4}" = "9999"]?14:5))
+exten => _0[0-9].,5,Set(COD=${CAMP:1:4})
+exten => _0[0-9].,6,Set(ID=${UNIQUEID})
+exten => _0[0-9].,7,agi(campanha_cdr.agi)
+exten => _0[0-9].,8,Set(CALLFILENAME1=/var/www/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/)
+exten => _0[0-9].,9,Set(CALLFILENAME2=${CALLFILENAME1}${TIMESTAMP:9:10}-${EXTEN:1})
+exten => _0[0-9].,10,Set(LI=http://localhost/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/${TIMESTAMP:9:10}-${EXTEN:1}.WAV)
+exten => _0[0-9].,11,agi(link_grav.agi)
+exten => _0[0-9].,12,Monitor(wav49,${CALLFILENAME2},m)
+exten => _0[0-9].,13,Dial(Dgv/g1/${EXTEN:1},60,tT)
+exten => _0[0-9].,14,Hangup
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+;Operadores bancorbras
+[1007]
+include => default
+;Ligacoes pela rota 0
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Ligacoes locais / DDD / DDI
+exten => _0[0-9].,1,Answer
+exten => _0[0-9].,2,Set(OPCAO=${CHANNEL:4:6})
+exten => _0[0-9].,3,agi(campanha.agi)
+exten => _0[0-9].,4,GotoIf($["${CAMP:1:4}" = "9999"]?14:5))
+exten => _0[0-9].,5,Set(COD=${CAMP:1:4})
+exten => _0[0-9].,6,Set(ID=${UNIQUEID})
+exten => _0[0-9].,7,agi(campanha_cdr.agi)
+exten => _0[0-9].,8,Set(CALLFILENAME1=/var/www/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/)
+exten => _0[0-9].,9,Set(CALLFILENAME2=${CALLFILENAME1}${TIMESTAMP:9:10}-${EXTEN:1})
+exten => _0[0-9].,10,Set(LI=http://localhost/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/${TIMESTAMP:9:10}-${EXTEN:1}.WAV)
+exten => _0[0-9].,11,agi(link_grav.agi)
+exten => _0[0-9].,12,Monitor(wav49,${CALLFILENAME2},m)
+exten => _0[0-9].,13,Dial(Dgv/g2/${EXTEN:1},60,tT)
+exten => _0[0-9].,14,Hangup
+
+;////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Operador SEBRAE 
+[1011]
+include => default
+
+;Ligacoes pela rota 0
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Ligacoes locais / DDD / DDI
+exten => _0[0-9].,1,Answer
+exten => _0[0-9].,2,Set(OPCAO=${CHANNEL:4:6})
+exten => _0[0-9].,3,agi(campanha.agi)
+exten => _0[0-9].,4,GotoIf($["${CAMP:1:4}" = "9999"]?14:5))
+exten => _0[0-9].,5,Set(COD=${CAMP:1:4})
+exten => _0[0-9].,6,Set(ID=${UNIQUEID})
+exten => _0[0-9].,7,agi(campanha_cdr.agi)
+exten => _0[0-9].,8,Set(CALLFILENAME1=/var/www/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/)
+exten => _0[0-9].,9,Set(CALLFILENAME2=${CALLFILENAME1}${TIMESTAMP:9:10}-${EXTEN:1})
+exten => _0[0-9].,10,Set(LI=http://localhost/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/${TIMESTAMP:9:10}-${EXTEN:1}.WAV)
+exten => _0[0-9].,11,agi(link_grav.agi)
+exten => _0[0-9].,12,Monitor(wav49,${CALLFILENAME2},m)
+exten => _0[0-9].,13,Dial(Dgv/g1/${EXTEN:1},60,tT)
+exten => _0[0-9].,14,Hangup
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+;supervisor boa bancobras
+[1008]
+include => default
+include => 1007
+
+;Logout agente
+exten => _*91.,1,Answer()
+exten => _*91.,2,Set(COD_AGENTE=${EXTEN:3})
+exten => _*91.,3,Set(DT_I=${TIMESTAMP})
+exten => _*91.,4,agi(agente_eventos_logout.agi)
+exten => _*91.,5,System(asterisk -rx "agent logoff Agent/${EXTEN:3}")
+exten => _*91.,6,PlayBack(prog_aceita)
+exten => _*91.,7,Hangup
+
+;Pausar agente
+exten => _*92.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*92.,2,Set(COD_EVENTO=72)
+exten => _*92.,3,Set(DT_I=${TIMESTAMP})
+exten => _*92.,4,agi(agente_eventos_unpause.agi)
+exten => _*92.,5,agi(agente_eventos_pause.agi)
+exten => _*92.,6,agi(agente_eventos.agi)
+exten => _*92.,7,PauseQueueMember(|Agent/${EXTEN:3})
+exten => _*92.,8,PlayBack(prog_aceita)
+
+;Tirar agente da pausa
+exten => _*93.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*93.,2,Set(DT_I=${TIMESTAMP})
+exten => _*93.,3,agi(agente_eventos_unpause.agi)
+exten => _*93.,4,UnPauseQueueMember(|Agent/${EXTEN:3})
+Exten => _*93.,5,PlayBack(prog_aceita)
+
+
+;Monitorar agente
+exten => _*94.,1,chanspy(agent/${EXTEN:3})
+
+;Monitorar ramal
+exten => _*95.,1,chanspy(SIP/${EXTEN:3})
+
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Supervisor Boa Vista 
+
+[1003]
+include => default
+
+;Logout agente
+exten => _*91.,1,Answer()
+exten => _*91.,2,Set(COD_AGENTE=${EXTEN:3})
+exten => _*91.,3,Set(DT_I=${TIMESTAMP})
+exten => _*91.,4,agi(agente_eventos_logout.agi)
+exten => _*91.,5,System(asterisk -rx "agent logoff Agent/${EXTEN:3}")
+exten => _*91.,6,PlayBack(prog_aceita)
+exten => _*91.,7,Hangup
+
+;Pausar agente
+exten => _*92.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*92.,2,Set(COD_EVENTO=72)
+exten => _*92.,3,Set(DT_I=${TIMESTAMP})
+exten => _*92.,4,agi(agente_eventos_unpause.agi)
+exten => _*92.,5,agi(agente_eventos_pause.agi)
+exten => _*92.,6,agi(agente_eventos.agi)
+exten => _*92.,7,PauseQueueMember(|Agent/${EXTEN:3})
+exten => _*92.,8,PlayBack(prog_aceita)
+
+;Tirar agente da pausa
+exten => _*93.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*93.,2,Set(DT_I=${TIMESTAMP})
+exten => _*93.,3,agi(agente_eventos_unpause.agi)
+exten => _*93.,4,UnPauseQueueMember(|Agent/${EXTEN:3})
+Exten => _*93.,5,PlayBack(prog_aceita)
+
+
+;Monitorar agente
+exten => _*94.,1,chanspy(agent/${EXTEN:3})
+
+;Monitorar ramal
+exten => _*95.,1,chanspy(SIP/${EXTEN:3})
+
+;///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Operador boavista
+[1002]
+include => default
+;Ligacoes pela rota 0
+;Ligacoes locais / DDD / DDI
+exten => _00XX95.,1,Answer
+exten => _00XX95.,2,Set(OPCAO=${CHANNEL:4:6})
+exten => _00XX95.,3,agi(campanha.agi)
+exten => _00XX95.,4,GotoIf($["${CAMP:1:4}" = "9999"]?14:5))
+exten => _00XX95.,5,Set(COD=${CAMP:1:4})
+exten => _00XX95.,6,Set(ID=${UNIQUEID})
+exten => _00XX95.,7,agi(campanha_cdr.agi)
+exten => _00XX95.,8,Set(CALLFILENAME1=/var/www/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/)
+exten => _00XX95.,9,Set(CALLFILENAME2=${CALLFILENAME1}${TIMESTAMP:9:10}-${EXTEN:1})
+exten => _00XX95.,10,Set(LI=http://localhost/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:4:6}/${TIMESTAMP:9:10}-${EXTEN:1}.WAV)
+exten => _00XX95.,11,agi(link_grav.agi)
+exten => _00XX95.,12,Monitor(wav49,${CALLFILENAME2},m)
+exten => _00XX95.,13,Dial(Dgv/g1/${EXTEN:1},60,tT)
+exten => _00XX95.,14,Hangup
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Contextos de servicos / ura
+[cimfel]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(cimfel|tThH|||3000)
+
+[postosorriso]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(postosorriso|tThH|||3000)
+
+[pirenopolis]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(pirenopolis|tThH|||3000)
+
+[drogariarosario]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(drogariar|tThH|||3000)
+
+[polyelle]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(polyelle|tThH|||3000)
+
+[bommotivo]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(bommotivo|tThH|||3000)
+
+[gasoline]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(gasoline|tThH|||3000)
+
+[supermaia]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(supermaia|tThH|||3000)
+
+[gasol]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(gasol|tThH|||3000)
+
+[tesoura]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(tesoura|tThH|||3000)
+
+[bancorbras]
+exten => s,1,Set(ID=${UNIQUEID})
+exten => s,2,Set(HR_I=${hr_inicial})
+exten => s,3,agi(hora_fila_cdr.agi)
+exten => s,4,Queue(bancorbras|tThH|||3000)
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

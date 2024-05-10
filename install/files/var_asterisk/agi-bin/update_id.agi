@@ -1,0 +1,79 @@
+#!/usr/bin/php5 -q
+<?php
+require('conexao.php');
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+// Funcao que conecta ao banco de dados
+
+function conectar($host, $port, $db, $usuario, $senha){
+$conn = "host=".$host." port=".$port." dbname=".$db." user=".$usuario." password=".$senha;
+$acesso = pg_connect($conn) or die("O Servidor de Banco de Dados não está disponível --> " . pg_last_error($conn)); 
+}
+
+conectar(HOST, PORT, DBASE, USER, PASS);
+
+write("GET VARIABLE CTI");
+$c = read();
+$cti = substr($c,14);
+$cti = substr($cti,0,-1);
+
+write("GET VARIABLE ID");
+$c = read();
+$id = substr($c,14);
+$id = substr($id,0,-1);
+
+echo "VERBOSE \"CTI: $cti\" \n";
+echo "VERBOSE \"ID: $id\" \n";
+
+$result = '';
+
+$query = "SELECT uniqueid FROM realtime_atendidas_cdr WHERE substring(transferencia,4) = '$cti'";
+$query_result = pg_query($query) or die("ERRO");
+$result = pg_fetch_result($query_result,0,'uniqueid');
+echo "VERBOSE \"CTI: $result\" \n";
+
+if ($result!=''){
+ $query = "UPDATE atendidas_cdr SET uniqueid_trans = '$id' WHERE substring(transferencia,4) = '$cti' AND uniqueid = '$result'";
+ $query_result = pg_query($query) or die("ERRO"); 
+ echo "VERBOSE \"CTI: $query)\" \n";
+}
+else
+ echo "VERBOSE \"RESULT: 0)\" \n";
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

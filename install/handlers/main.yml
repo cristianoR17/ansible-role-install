@@ -1,0 +1,13 @@
+---
+# handlers file for roles/install
+- name: Restarting restard
+  service:
+    name: restartd
+    state: restarted
+
+- name: Restarting cron
+  systemd:
+    name: cron.service
+    state: restarted
+
+

@@ -1,0 +1,729 @@
+[general]
+
+
+static=yes
+writeprotect=yes
+autofallthrough=no
+clearglobalvars=no
+proorityjumping=no
+switch => Realtime
+
+[globals]
+
+CONSOLE=Console/dsp				; Console interface for demo
+
+IAXINFO=guest					; IAXtel username/password
+
+TRUNK=DAHDI/G2					; Trunk interface
+
+TRUNKMSD=1					; MSD digits to strip (usually 1 or 0)
+
+REAL = 0 
+CENT = 0
+RETORNO = 0
+DEBITOS = 0
+INEXISTENTE = 1 
+EXEAGI = 0
+CONTEXTO = 0
+RDOMINIO = 0
+BADM = 0
+CPF = 0
+TELEFONE = 0
+CEP = 0
+IDREGIAO = 0
+DT_INICIAL = 0
+DT_FINAL = 0
+COD_MENU = 0 
+COD_OPCAO = 0
+CONTA=0
+CONSULT_MSG=0
+CONSULT_NU=0
+VIDEO=1
+
+;Rotas para ligacoes saintes
+ROTA0=SIP/gvtip/
+
+ROTA1=SIP/gvtip/025
+
+
+AbsoluteTimeout = 35
+LANGUAGE = pt
+; Dial timeout - 20sec.
+DIAL_TOUT=20
+; Digit timeout - 3sec.
+DIGIT_TOUT=8
+; Response timeout - 10sec.
+RESP_TOUT=10
+;Set toda conta como invalida
+
+;Link de gravacao receptivo
+SUPPORT_MONITOR_PATH_RECEPTIVO=/home/gravacoes/receptivo/
+SERVIDOR_RECEPTIVO=http://192.168.0.202/gravacoes/receptivo/
+
+;Link de gravacao do tipo ativa
+SUPPORT_MONITOR_PATH_ATIVO=/home/gravacoes/ativo/
+SERVIDOR_ATIVO=http://192.168.0.202/gravacoes/ativo/
+
+
+
+
+[default]
+switch => Realtime
+
+exten => _50[1-2],1,Meetme(${EXTEN})
+
+;Servico 2
+exten => _1002.,1,Answer()
+exten => _1002.,2,SetCti(${UNIQUEID}-${CALLERID(name)})
+exten => _1002.,3,Set(CD_QUEUE=1002)
+exten => _1002.,4,GotoIfTime(08:00-20:00|mon-fri|*|*?queue,s,1)
+exten => _1002.,5,GotoIfTime(09:00-18:00|sat-sat|*|*?queue,s,1)
+exten => _1002.,6,GotoIfTime(09:00-12:00|sun-sun|*|*?queue,s,1)
+exten => _1002.,7,PlayBack(/var/lib/asterisk/teste/fora_do_horario)
+exten => _1002.,8,Hangup()
+
+
+exten => 9999,1,Answer()
+exten => 9999,2,Set(COMUNIX=${CALLERID(name)})
+exten => 9999,3,agi(/var/lib/asterisk/agi-bin/teste.agi)
+exten => 9999,4,noop(${RESULT})
+exten => 9999,5,Hangup()
+
+;exten => s,1,Answer()
+;exten => s,2,Wait(0.5)
+;exten => s,3,background(/var/lib/asterisk/comunix/mudanca_de_numero)
+;exten => s,4,Hangup()
+
+;Atende novo DDR GERAL - 6130384600
+exten => 6130384600,1,goto(comunix,s,1)
+
+;exten => 6130429204,1,goto(comunix,s,1)
+
+
+;exten => 6130384629,1,Answer()
+;exten => 6130384629,2,PlayBAck(/teste)
+;exten => 6130384629,3,Hangup()
+
+exten => 6130384629,1,goto(servico,s,1)
+
+;exten => 6130384627,1,goto(fale_digito,s,1)
+
+exten => 6130384628,1,goto(ura,s,1)
+exten => 6130384627,1,goto(ura1,s,1)
+
+exten => 6130384622,1,Dial(SIP/gvtip/0800555855,60)
+exten => 6130384622,2,Hangup()
+
+;Atende novo DDR direto - 6130384600
+;exten => _613038.,1,Dial(SIP/${EXTEN:6:4},20,Tt)
+exten => _613038.,1,goto(1010,${EXTEN:6},1)
+
+
+[tecla_10_segundos]
+exten => s,1,Answer()
+exten => s,2,Wait(3)
+exten => s,3,background(/var/lib/asterisk/teste/URA_10_Segundos)
+exten => s,4,wait(10)
+exten => s,5,playback(/var/lib/asterisk/teste/Nao_identificamos)
+exten => s,6,dial(SIP/4616,60,tT)
+exten => s,7,HangUP()
+
+
+
+[comunix]
+
+include => default
+
+;######################################
+;Configuracao Nova URA - 2011-06-22
+;######################################
+
+;exten => s,1,Answer()
+;exten => s,2,Wait(0.5)
+;exten => s,3,background(/var/lib/asterisk/comunix/comunix_antigo)
+;exten => s,4,Dial(SIP/4600,60,Tt) ;Felipe
+;exten => s,5,Hangup()
+
+
+exten => s,1,Answer()
+exten => s,2,Wait(0.5)
+exten => s,3,background(/var/lib/asterisk/comunix/boas_vindas)
+exten => s,4,Wait(5)
+exten => s,5,goto(comunix,s,3)
+
+
+;OPCAO 1 - Suporte
+exten => 1,1,Answer
+;exten => 1,2,Dial(SIP/gvtip/98093368,60) ;Plantao
+;exten => 1,2,Dial(SIP/gvtip/84066554,60) ;Gilcimar
+exten => 1,2,noop()
+exten => 1,3,goto(1010,4616,1) ;Suporte
+;exten => 1,6,Dial(SIP/PBX/4616,60,Tt) 
+
+;OPCAO 2 - Comercial
+exten => 2,1,Answer
+;exten => 2,2,Dial(SIP/4601,30,Tt) ;R.Neves
+;exten => 2,3,Dial(SIP/4602,30,Tt) ;PauloVNS
+exten => 2,2,goto(1010,4600,1) ;Marcos
+exten => 2,3,Hangup()
+
+;OPCAO 3 - Administrativo
+exten => 3,1,Answer
+exten => 3,2,goto(1010,4600,1);Marcos
+
+;OPCAO 4 - Disca plantao => 4,1,Answer
+exten => 4,1,Answer
+exten => 4,2,Goto(comunixplantao,1,1)
+exten => 4,3,Hangup()
+
+;OPCAO 5 - Conferencia Teste
+
+exten => 5,1,Meetme(502)
+
+;Teste Vaner
+;exten => 5,1,Answer
+;exten => 5,2,Goto(1010,4604,1)
+;exten => 5,3,Hangup()
+
+
+;Opcao I - INVALIDA Tranfere para fila informacoes
+exten => i,1,Answer
+exten => i,2,goto(1010,4600,1);Felipe
+exten => i,3,Hangup()
+
+;Opcao T - TIMEOUT Transfere para geral
+exten => t,1,Answer
+exten => t,2,goto(1010,4600,1) ;Felipe
+
+;Cifras externas
+;#############################################################################################################
+
+;Servico 1
+exten => _1001.,1,Answer()
+exten => _1001.,2,SetCti(${UNIQUEID}-${CALLERID(name)})
+exten => _1001.,3,Set(CD_QUEUE=1001)
+exten => _1001.,4,GotoIfTime(08:00-20:00|mon-fri|*|*?queue,s,1)
+exten => _1001.,5,GotoIfTime(09:00-18:00|sat-sat|*|*?queue,s,1)
+exten => _1001.,6,GotoIfTime(09:00-12:00|sun-sun|*|*?queue,s,1)
+exten => _1001.,7,PlayBack(/var/lib/asterisk/teste/fora_do_horario)
+exten => _1001.,8,Hangup()
+
+;Servico 2
+;exten => _1002.,1,Answer()
+;exten => _1002.,2,SetCti(${UNIQUEID}-${CALLERID(name)})
+;exten => _1002.,3,Set(CD_QUEUE=1002)
+;exten => _1002.,4,GotoIfTime(08:00-20:00|mon-fri|*|*?queue,s,1)
+;exten => _1002.,5,GotoIfTime(09:00-18:00|sat-sat|*|*?queue,s,1)
+;exten => _1002.,6,GotoIfTime(09:00-12:00|sun-sun|*|*?queue,s,1)
+;exten => _1002.,7,PlayBack(/var/lib/asterisk/teste/fora_do_horario)
+;exten => _1002.,8,Hangup()
+;#############################################################################################################
+
+;;################################
+; Comunix Plantao - NAO APAGAR - 29/06/2011
+;;################################
+[comunixplantao]
+exten => s,1,Answer()
+exten => s,2,background(/var/lib/asterisk/comunix/comunix_plantao)
+
+exten => 1,1,Answer
+exten => 1,2,Dial(SIP/gvtip/98093368,30)
+exten => 1,3,Dial(SIP/gvtip/81644893,60)
+exten => 1,4,Dial(SIP/gvtip/99822144,60)
+exten => 1,5,Hangup()
+;;################################
+
+
+
+
+
+
+;supervisor  
+[1002]
+include => 1001
+include => eventos
+
+;Ligacoes entre internas 4X* e 5X*
+exten => _[4-5].,1,Set(CLID=${EXTEN})
+exten => _[4-5].,2,Set(CD_AGENTE=${CHANNEL:4:6})
+exten => _[4-5].,3,Set(ID=${UNIQUEID})
+exten => _[4-5].,4,Set(FILA='q0001')
+exten => _[4-5].,5,agi(opcao_fila.agi)
+exten => _[4-5].,6,agi(uniqueid.agi)
+exten => _[4-5].,7,Set(CALLFILENAME1=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/)
+exten => _[4-5].,8,Set(CALLFILENAME2=${SUPPORT_MONITOR_PATH_ATIVO}${CALLFILENAME1}${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):9:4}${NEW_UNIQUEID})
+exten => _[4-5].,9,Set(LI=${SERVIDOR_ATIVO}${CALLFILENAME1}${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):9:4}${NEW_UNIQUEID}.WAV)
+exten => _[4-5].,10,agi(link_grav.agi)
+exten => _[4-5].,11,Monitor(wav49,${CALLFILENAME2},m)
+exten => _[4-5].,12,Dial(SIP/${EXTEN},60,tT)
+exten => _[4-5].,14,Hangup()
+
+;envia gravacao para numero / ramal
+exten => _*199.,1,Set(CONSULT_GRAV=${EXTEN:4})
+exten => _*199.,2,agi(consulta_gravacao.agi)
+exten => _*199.,3,Dial(SIP/PBXKHOMP00/7${CONSULT_NU},60,A(${CONSULT_MSG}))
+exten => _*199.,4,Hangup()
+
+;#############################################################################################################
+;comandos dos supervisores
+;#############################################################################################################
+;Pausa agente
+exten => _*100.,1,Set(COD_AGENTE=${EXTEN:4:6}) 
+exten => _*100.,2,Set(COD_EVENTO=100)
+exten => _*100.,3,Set(DT_I=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)})
+exten => _*100.,4,agi(agente_eventos_unpause.agi)
+exten => _*100.,5,agi(agente_eventos_pause.agi)
+exten => _*100.,6,PauseQueueMember(|SIP/${EXTEN:4:6})
+exten => _*100.,7,PlayBack(prog_aceita)
+exten => _*100.,8,Hangup()
+
+;Tirar agente da pausa
+exten => _*101.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*101.,2,Set(DT_I=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)})
+exten => _*101.,3,agi(agente_eventos_unpause.agi)
+exten => _*101.,4,UnPauseQueueMember(|SIP/${EXTEN:4:6})
+exten => _*101.,5,PlayBack(prog_aceita)
+exten => _*101.,6,Hangup()
+
+;Monitorar agente
+exten => _*102.,1,chanspy(SIP/${EXTEN:4},q)
+
+;Interceptar
+exten => _*103.,1,chanspy(SIP/${EXTEN:4},qbw)
+
+;Logout agente
+exten => _*104.,1,Answer()
+exten => _*104.,2,Set(COD_AGENTE=${EXTEN:4:6})
+exten => _*104.,3,Set(DT_I=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)})
+exten => _*104.,4,goto(logout,s,1)
+exten => _*104.,5,Hangup()
+
+;#############################################################################################################
+;Operador 
+;#############################################################################################################
+[1001]
+;Local
+include => eventos
+include => default
+include => fax
+
+exten => _0[0-6]XXXXXXX,1,Set(CLID=${EXTEN:1})
+exten => _0[0-6]XXXXXXX,2,Set(OPCAO=${CHANNEL:4:6})
+exten => _0[0-6]XXXXXXX,3,agi(campanha.agi)
+exten => _0[0-6]XXXXXXX,4,GotoIf($[${CAMP_RESULT} = 0]?24:5))
+exten => _0[0-6]XXXXXXX,5,Set(COD=${CAMP_RETURN:0:4})
+exten => _0[0-6]XXXXXXX,6,agi(bloq_ativo.agi)
+exten => _0[0-6]XXXXXXX,7,GotoIf($["${BLOQ}" = "OK"]?8:21))
+exten => _0[0-6]XXXXXXX,8,Set(COD=${CAMP_RETURN:0:4})
+exten => _0[0-6]XXXXXXX,9,Set(ID=${UNIQUEID})
+exten => _0[0-6]XXXXXXX,10,Set(FILA='q0000')
+exten => _0[0-6]XXXXXXX,11,agi(opcao_fila.agi)
+exten => _0[0-6]XXXXXXX,12,agi(uniqueid.agi)
+exten => _0[0-6]XXXXXXX,13,Set(CALLFILENAME1=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/)
+exten => _0[0-6]XXXXXXX,14,Set(CALLFILENAME2=${SUPPORT_MONITOR_PATH_ATIVO}${CALLFILENAME1}${NEW_UNIQUEID})
+exten => _0[0-6]XXXXXXX,15,Set(LI=${SERVIDOR_ATIVO}${CALLFILENAME1}${NEW_UNIQUEID}.WAV)
+exten => _0[0-6]XXXXXXX,16,agi(link_grav.agi)
+exten => _0[0-6]XXXXXXX,17,Monitor(wav49,${CALLFILENAME2},m)
+exten => _0[0-6]XXXXXXX,18,Dial(${ROTA0}${EXTEN:1},60,tT)
+exten => _0[0-6]XXXXXXX,19,GotoIf($["${DIALSTATUS}" = "BUSY"]?20:22))
+exten => _0[0-6]XXXXXXX,20,PlayBack(/var/lib/asterisk/extend/sistema/M_00011); Numero ocupado
+exten => _0[0-6]XXXXXXX,21,Hangup()
+exten => _0[0-6]XXXXXXX,22,PlayBack(/var/lib/asterisk/extend/sistema/M_00012); Falha na Chamada
+exten => _0[0-6]XXXXXXX,23,Hangup()
+exten => _0[0-6]XXXXXXX,24,PlayBack(/var/lib/asterisk/extend/sistema/M_00010); Operador nao logado ou nao associado a campanha
+exten => _0[0-6]XXXXXXX,25,Hangup()
+exten => _0[0-6]XXXXXXX,26,PlayBack(/var/lib/asterisk/extend/sistema/M_00013); Numero bloqueado para chamadas do tipo ativa
+exten => _0[0-6]XXXXXXX,27,Hangup()
+
+
+;Celular
+exten => _0[7-9].,1,Set(CLID=${EXTEN:1})
+exten => _0[7-9].,2,Set(OPCAO=${CHANNEL:4:6})
+exten => _0[7-9].,3,agi(campanha.agi)
+exten => _0[7-9].,4,GotoIf($[${CAMP_RESULT} = 0]?24:5))
+exten => _0[7-9].,5,Set(COD=${CAMP_RETURN:0:4})
+exten => _0[7-9].,6,agi(bloq_ativo.agi)
+exten => _0[7-9].,7,GotoIf($["${BLOQ}" = "OK"]?8:21))
+exten => _0[7-9].,8,Set(COD=${CAMP_RETURN:0:4})
+exten => _0[7-9].,9,Set(ID=${UNIQUEID})
+exten => _0[7-9].,10,Set(FILA='q0000')
+exten => _0[7-9].,11,agi(opcao_fila.agi)
+exten => _0[7-9].,12,agi(uniqueid.agi)
+exten => _0[7-9].,13,Set(CALLFILENAME1=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/)
+exten => _0[7-9].,14,Set(CALLFILENAME2=${SUPPORT_MONITOR_PATH_ATIVO}${CALLFILENAME1}${NEW_UNIQUEID})
+exten => _0[7-9].,15,Set(LI=${SERVIDOR_ATIVO}${CALLFILENAME1}${NEW_UNIQUEID}.WAV)
+exten => _0[7-9].,16,agi(link_grav.agi)
+exten => _0[7-9].,17,Monitor(wav49,${CALLFILENAME2},m)
+exten => _0[7-9].,18,Dial(${ROTA0}${EXTEN:1},60,tT)
+exten => _0[7-9].,19,GotoIf($["${DIALSTATUS}" = "BUSY"]?20:22))
+exten => _0[7-9].,20,PlayBack(/var/lib/asterisk/extend/sistema/M_00011); Numero ocupado
+exten => _0[7-9].,21,Hangup()
+exten => _0[7-9].,22,PlayBack(/var/lib/asterisk/extend/sistema/M_00012); Falha na Chamada
+exten => _0[7-9].,23,Hangup()
+exten => _0[7-9].,24,PlayBack(/var/lib/asterisk/extend/sistema/M_00010); Operador nao logado ou nao associado a campanha
+exten => _0[7-9].,25,Hangup()
+exten => _0[7-9].,26,PlayBack(/var/lib/asterisk/extend/sistema/M_00013); Numero bloqueado para chamadas do tipo ativa
+exten => _0[7-9].,27,Hangup()
+
+;Ligacoes entre internas 4X* e 5X*
+exten => _[4-5].,1,Set(CLID=${EXTEN})
+exten => _[4-5].,2,Set(CD_AGENTE=${CHANNEL:4:6})
+exten => _[4-5].,3,Set(ID=${UNIQUEID})
+exten => _[4-5].,4,Set(FILA='q0001')
+exten => _[4-5].,5,agi(opcao_fila.agi)
+exten => _[4-5].,6,agi(uniqueid.agi)
+exten => _[4-5].,7,Set(CALLFILENAME1=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/)
+exten => _[4-5].,8,Set(CALLFILENAME2=${SUPPORT_MONITOR_PATH_ATIVO}${NEW_UNIQUEID})
+exten => _[4-5].,9,Set(LI=${SERVIDOR_ATIVO}${CALLFILENAME1}${NEW_UNIQUEID}.WAV)
+exten => _[4-5].,10,agi(link_grav.agi)
+exten => _[4-5].,11,Monitor(wav49,${CALLFILENAME2},m)
+exten => _[4-5].,12,Dial(SIP/${EXTEN},60,tT)
+exten => _[4-5].,14,Hangup()
+
+;#############################################################################################################
+[eventos]
+;#############################################################################################################
+;Login
+exten => *71,1,Answer()
+exten => *71,2,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *71,3,Set(COD_EVENTO=71)
+exten => *71,4,Set(DT_I=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)})
+exten => *71,5,goto(login,s,1)
+
+exten => _*[72-83].,1,Answer()
+exten => _*[72-83].,2,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => _*[72-83].,3,Set(COD_EVENTO=${EXTEN:1:2})
+exten => _*[72-83].,4,goto(pausas,s,1)
+
+;Tirar da pausa
+exten => *84,1,Answer()
+exten => *84,2,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => *84,3,Set(DT_I=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)})
+exten => *84,4,agi(agente_eventos_unpause.agi)
+exten => *84,5,UnPauseQueueMember(|SIP/${CHANNEL:4:6})
+exten => *84,6,PlayBack(/var/lib/asterisk/extend/sistema/M_00008); Aguarde
+exten => *84,7,Wait(4)
+exten => *84,8,PlayBack(/var/lib/asterisk/extend/sistema/M_00009); Programacao Aceita
+exten => *84,9,Hangup()
+
+;Ramal
+[1010]
+include => fax
+include => default
+
+;Conferencia
+
+exten => _50[1-2],1,Meetme(${EXTEN})
+
+;Ligacoes para ramais XXXX (4 Digitos)
+exten => _4XXX,1,Answer()
+exten => _4XXX,2,Set(RAMAL=${EXTEN})
+exten => _4XXX,3,agi(siga_me.agi)
+exten => _4XXX,4,GotoIf($[${SIGA_ME}=0]?5:19))
+exten => _4XXX,5,Dial(SIP/${EXTEN},40,tT)
+exten => _4XXX,6,agi(e_mail.agi)
+exten => _4XXX,7,GotoIf($[${E_MAIL} = 0]?23:8))
+exten => _4XXX,8,Set(ID=${UNIQUEID})
+exten => _4XXX,9,agi(uniqueid.agi)
+exten => _4XXX,10,PlayBack(/var/lib/asterisk/extend/sistema/M_00017); Caixa Postal
+exten => _4XXX,11,PlayBack(beep)
+exten => _4XXX,12,Set(CALLFILENAME1=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/)
+exten => _4XXX,13,Set(CALLFILENAME2=${CALLFILENAME1}${NEW_UNIQUEID})
+exten => _4XXX,14,Set(MONITOR_FILENAME=${SUPPORT_MONITOR_PATH_RECEPTIVO}${CALLFILENAME2})
+exten => _4XXX,15,Set(MONITOR_EXEC_ARGS=/home/extend/./send_mail ${CALLERID(num)} ${MONITOR_FILENAME}.WAV ${E_MAIL})
+exten => _4XXX,16,Monitor(wav49,${MONITOR_FILENAME},m)
+exten => _4XXX,17,Wait(60)
+exten => _4XXX,18,Hangup()
+exten => _4XXX,19,GotoIf($[${SIGA_ME} > 9999]?22:20))
+exten => _4XXX,20,Dial(SIP/${SIGA_ME},40,tT) ; Siga-me interno
+exten => _4XXX,21,Hangup()
+exten => _4XXX,22,Dial(${ROTA0}${SIGA_ME},40,tT) ; Sigame Externo Configurar rota externa
+exten => _4XXX,23,Hangup()
+
+;Ligacoes Para Ramais XXXXXX (6 Digitos)
+exten => _[4-5].,1,Dial(SIP/${EXTEN},60,tT)
+exten => _[4-5].,2,Hangup()
+
+;Siga-me interno
+exten => _*100XXXX,1,Answer()
+exten => _*100XXXX,2,Set(DADO=${CHANNEL:4:4}${EXTEN:4:4})
+exten => _*100XXXX,3,agi(siga_me_interno.agi)
+exten => _*100XXXX,4,GotoIf($[${SIGA_ME}=0]?7:5))
+exten => _*100XXXX,5,PlayBack(/var/lib/asterisk/extend/sistema/M_00009); Programacao Aceita
+exten => _*100XXXX,6,Hangup()
+exten => _*100XXXX,7,PlayBack(/var/lib/asterisk/extend/sistema/M_00014); Falha no envio do comando
+exten => _*100XXXX,8,Hangup()
+
+;Siga-me externo
+exten => _*101.,1,Answer()
+exten => _*101.,2,Set(DADO=${CHANNEL:4:4}${EXTEN:4})
+exten => _*101.,3,agi(siga_me_externo.agi)
+exten => _*101.,4,GotoIf($[${SIGA_ME}=0]?7:5))
+exten => _*101.,5,PlayBack(/var/lib/asterisk/extend/sistema/M_00009); Programacao Aceita
+exten => _*101.,6,Hangup()
+exten => _*101.,7,PlayBack(/var/lib/asterisk/extend/sistema/M_00014); Falha no envio do comando
+exten => _*101.,8,Hangup()
+
+;Cancelar Siga-me
+exten => _*102,1,Answer()
+exten => _*102,2,Set(DADO=${CHANNEL:4:4})
+exten => _*102,3,agi(un_siga_me.agi)
+exten => _*102,4,PlayBack(/var/lib/asterisk/extend/sistema/M_00009); Programacao Aceita
+exten => _*102,5,Hangup()
+
+;Bloq Ramal
+exten => _*103,1,Answer()
+exten => _*103,2,Set(DADO=${CHANNEL:4:4})
+exten => _*103,3,agi(bloquear_ramal.agi)
+exten => _*103,4,PlayBack(/var/lib/asterisk/extend/sistema/M_00009); Programacao Aceita
+exten => _*103,5,Hangup()
+
+;UnBloq
+exten => _*104.,1,Answer()
+exten => _*104.,2,Set(DADO=${CHANNEL:4:4}${EXTEN:4})
+exten => _*104.,3,agi(un_bloquear_ramal.agi)
+exten => _*104.,4,GotoIf($[${BLOQUEADO}=1]?7:5))
+exten => _*104.,5,PlayBack(/var/lib/asterisk/extend/sistema/M_00009); Programacao Aceita
+exten => _*104.,6,Hangup()
+exten => _*104.,7,PlayBack(/var/lib/asterisk/extend/sistema/M_00014); Falha no envio do comando
+exten => _*104.,8,Hangup()
+
+;Gravacao de mensagem
+exten => _*105,1,Answer()
+exten => _*105,2,Set(DADO=${CHANNEL:4:4}${EXTEN:4})
+exten => _*105,3,PlayBack(/var/lib/asterisk/extend/sistema/M_00017)
+exten => _*105,4,Record(/var/lib/asterisk/sounds/${DADO}:gsm|2|60)
+exten => _*105,5,Hangup()
+
+;Ouvir mensagem
+exten => _*106,1,Answer()
+exten => _*106,2,Set(DADO=${CHANNEL:4:4}${EXTEN:4})
+exten => _*106,3,PlayBack(/var/lib/asterisk/sounds/${DADO})
+exten => _*106,4,Hangup()
+
+;0800
+exten => _00800.,1,Dial(${ROTA0}${EXTEN:1},60,tT);Rota para ligação externa
+exten => _00800.,2,Hangup()
+
+;Policia
+exten => _0190,1,Dial(${ROTA0}${EXTEN:1},60,tT);Rota para ligação externa
+exten => _0190,2,Hangup()
+
+;Samu
+exten => _0192,1,Dial(${ROTA0}${EXTEN:1},60,tT);Rota para ligação externa
+exten => _0192,2,Hangup()
+
+;Bombeiro
+exten => _0193,1,Dial(${ROTA0}${EXTEN:1},60,tT);Rota para ligação externa
+exten => _0193,2,Hangup()
+
+exten => _*8.,1,Set(GLOBAL(PICKUPMARK)=${EXTEN:2})
+exten => _*8.,2,Pickup(${EXTEN:2}@pickupmark)
+
+;Local
+[1011]
+include => 1010
+
+exten => _0[1-6].,1,Set(RAMAL=${CHANNEL:4:4})
+exten => _0[1-6].,2,agi(ver_bloqueio_ramal.agi)
+exten => _0[1-6].,3,GotoIf($[${BLOQUEADO}=1]?6:4))
+exten => _0[1-6].,4,Dial(${ROTA0}${EXTEN:1},60,tT);Rota para ligação externa
+exten => _0[1-6].,5,Hangup()
+exten => _0[1-6].,6,PlayBack(/var/lib/asterisk/extend/sistema/M_00015); Ramal bloqueado
+exten => _0[1-6].,7,Hangup()
+
+;Celular
+[1012]
+include => 1010
+include => 1011
+
+exten => _0[6-9].,1,Set(RAMAL=${CHANNEL:4:4})
+exten => _0[6-9].,2,agi(ver_bloqueio_ramal.agi)
+exten => _0[6-9].,3,GotoIf($[${BLOQUEADO}=1]?6:4))
+exten => _0[6-9].,4,Dial(${ROTA0}${EXTEN:1},60,tT);Rota para ligação externa
+exten => _0[6-9].,5,Hangup()
+exten => _0[6-9].,6,PlayBack(/var/lib/asterisk/extend/sistema/M_00015); Ramal bloqueado
+exten => _0[6-9].,7,Hangup()
+
+;DDD e DDI
+[1013]
+include => 1010
+include => 1011
+include => 1012
+
+
+
+exten => _00800.,1,Dial(${ROTA0}${EXTEN:1},60,tT);Rota para ligação externa
+exten => _00800.,2,Hangup()
+
+exten => _00XX[0-6].,1,Set(RAMAL=${CHANNEL:4:4})
+exten => _00XX[0-6].,2,agi(ver_bloqueio_ramal.agi)
+exten => _00XX[0-6].,3,GotoIf($[${BLOQUEADO}=1]?6:4))
+exten => _00XX[0-6].,4,Dial(${ROTA1}${EXTEN:2},60,tT);Rota para ligação externa
+exten => _00XX[0-6].,5,Hangup()
+exten => _00XX[0-6].,6,PlayBack(/var/lib/asterisk/extend/sistema/M_00015); Ramal bloqueado
+exten => _00XX[0-6].,7,Hangup()
+
+exten => _00XX[7-9].,1,Set(RAMAL=${CHANNEL:4:4})
+exten => _00XX[7-9].,2,agi(ver_bloqueio_ramal.agi)
+exten => _00XX[7-9].,3,GotoIf($[${BLOQUEADO}=1]?6:4))
+exten => _00XX[7-9].,4,Dial(${ROTA1}${EXTEN:2},60,tT);Rota para ligação externa
+exten => _00XX[7-9].,5,Hangup()
+exten => _00XX[7-9].,6,PlayBack(/var/lib/asterisk/extend/sistema/M_00015); Ramal bloqueado
+exten => _00XX[7-9].,7,Hangup()
+
+[fax]
+;Receber fax
+exten => _20XX,1,Answer
+exten => _20XX,2,Set(DIR=/home/fax/${EXTEN}/${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/)
+exten => _20XX,3,System(mkdir ${DIR})
+exten => _20XX,4,Set(ID=${UNIQUEID})
+exten => _20XX,5,agi(uniqueid.agi)
+exten => _20XX,6,RxFAx(${DIR}${NEW_UNIQUEID}.tif)
+exten => _20XX,7,Hangup()
+
+;FAX ENVIO
+exten => _9090.,1,Answer()
+exten => _9090.,2,Set(FAX=${EXTEN:4})
+exten => _9090.,3,agi(fax.agi)
+exten => _9090.,4,GotoIf($[${ARQ0}!=0]?5:16))
+exten => _9090.,5,system(/home/extend/./send_fax /home/extendphone/${ARQ0}.tif /home/extendphone/${ARQ0}.pdf)
+exten => _9090.,6,wait(1)
+exten => _9090.,7,TxFax(/home/extendphone/${ARQ0}.tif)
+exten => _9090.,8,System(mkdir /home/extendphone/transmitidos/${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2})
+exten => _9090.,9,System(touch /home/extendphone/transmitidos/${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/${STRFTIME(${EPOCH},,%Y-%m-%d_%H-%M-%S)}_${ARQ0}_QtdPg_${FAXPAGES})
+exten => _9090.,10,GotoIf($[${ARQ1}!=0]?11:16))
+exten => _9090.,11,system(/home/extend/./send_fax /home/extendphone/${ARQ1}.tif /home/extendphone/${ARQ1}.pdf)
+exten => _9090.,12,wait(1)
+exten => _9090.,13,TxFax(/home/extendphone/${ARQ1}.tif)
+exten => _9090.,14,System(mkdir /home/extendphone/transmitidos/${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2})
+exten => _9090.,15,System(touch /home/extendphone/transmitidos/${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/${STRFTIME(${EPOCH},,%Y-%m-%d_%H-%M-%S)}_${ARQ1}_QtdPg_${FAXPAGES})
+exten => _9090.,16,Hangup()
+
+;#############################################################################################################
+;Contextos de servicos 
+;#############################################################################################################
+[queue]
+exten => s,1,Answer()
+exten => s,2,Set(CLID=${CALLERID(name)})
+exten => s,3,Set(CH=${CHANNEL})
+exten => s,4,Set(ID=${UNIQUEID})
+exten => s,5,Set(FILA=q${CD_QUEUE})
+exten => s,6,agi(opcao_fila.agi)
+exten => s,7,agi(uniqueid.agi)
+exten => s,8,Set(CALLFILENAME1=${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):0:4}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):4:2}-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S):6:2}/)
+exten => s,9,Set(CALLFILENAME2=${CALLFILENAME1}${NEW_UNIQUEID})
+exten => s,10,Set(LI=${SERVIDOR_RECEPTIVO}${CALLFILENAME1}${NEW_UNIQUEID}.WAV)
+exten => s,11,agi(link_grav.agi)
+exten => s,12,System(mkdir ${SUPPORT_MONITOR_PATH_RECEPTIVO}${CALLFILENAME1})
+exten => s,13,Set(MONITOR_FILENAME=${SUPPORT_MONITOR_PATH_RECEPTIVO}${CALLFILENAME2})
+exten => s,14,Queue(q${CD_QUEUE}|tThHwW|||3000)
+exten => s,15,Hangup()
+
+;Login do agente
+;#############################################################################################################
+[login]
+exten => s,1,Answer() 
+exten => s,2,Set(COD_AGENTE=${CHANNEL:4:6})
+exten => s,3,agi(agente_eventos.agi)
+exten => s,4,Gotoif($[${LOGIN} = 0 ]?5:6) 
+exten => s,5,goto(ERRO_LOGIN,s,1)
+exten => s,6,Set(COD_EVENTO=71)
+exten => s,7,UnPauseQueueMember(|SIP/${CHANNEL:4:6})
+exten => s,8,BackGround(/var/lib/asterisk/extend/sistema/M_00004);Agente logado
+exten => s,9,Hangup()
+
+[ERRO_LOGIN]
+exten => s,1,PlayBack(/var/lib/asterisk/extend/sistema/M_00003) ;Login invalido
+exten => s,2,Hangup()
+
+;#############################################################################################################
+[pausas]
+exten => s,1,agi(agente_eventos_pause.agi)
+exten => s,2,PauseQueueMember(|SIP/${CHANNEL:4:6})
+exten => s,3,PlayBack(/var/lib/asterisk/extend/sistema/M_00009); Programacao Aceita
+exten => s,4,Hangup()
+;#############################################################################################################
+;Logout Agente
+;#############################################################################################################
+[logout]
+exten => s,1,agi(agente_eventos_logout.agi)
+exten => s,2,Gotoif($[${LOGIN} = 1 ]?3:5) 
+exten => s,3,BackGround(/var/lib/asterisk/extend/sistema/M_00005);Agente deslogado
+exten => s,4,Hangup()
+exten => s,5,BackGround(/var/lib/asterisk/extend/sistema/M_00003);Logout Incorreto
+exten => s,6,Hangup()
+
+[PLAY_MSG]
+exten => s,1,Answer()
+exten => s,2,Wait(3)
+exten => s,3,PlayBack(${CONSULT_MSG}) 
+
+[local]
+include => default
+include => 1002
+
+[fale_digito]
+exten => s,1,Answer()
+exten => s,2,Wait(3)
+exten => s,3,background(digite_seu_cpf)
+exten => s,4,background(vazio)
+exten => 1,1,playback(um)
+exten => 1,2,goto(fale_digito,s,4)
+exten => 2,1,playback(dois)
+exten => 2,2,goto(fale_digito,s,4)
+exten => 3,1,playback(tres)
+exten => 3,2,goto(fale_digito,s,4)
+exten => 4,1,playback(quatro)
+exten => 4,2,goto(fale_digito,s,4)
+exten => 5,1,playback(cinco)
+exten => 5,2,goto(fale_digito,s,4)
+exten => 6,1,playback(seis)
+exten => 6,2,goto(fale_digito,s,4)
+exten => 7,1,playback(sete)
+exten => 7,2,goto(fale_digito,s,4)
+exten => 8,1,playback(oito)
+exten => 8,2,goto(fale_digito,s,4)
+exten => 9,1,playback(nove)
+exten => 9,2,goto(fale_digito,s,4)
+exten => 0,1,playback(zero)
+exten => 0,2,goto(fale_digito,s,4)
+
+[servico]
+;Servico 1
+exten => s,1,Answer()
+exten => s,2,Wait(3)
+exten => s,3,background(digite_seu_cpf)
+
+
+exten => _XXXXXXXXXXX,1,Answer()
+exten => _XXXXXXXXXXX,2,SetCti(${EXTEN}-${CALLERID(num)})
+exten => _XXXXXXXXXXX,3,Set(CD_QUEUE=1001)
+exten => _XXXXXXXXXXX,4,GotoIfTime(00:00-23:59|mon-fri|*|*?queue,s,1)
+
+[ura]
+exten => s,1,Answer()
+exten => s,2,Wait(3)
+exten => s,3,background(/teste3)
+
+exten => _X,1,Record(/${EXTEN}.gsm)
+exten => _X,2,Hangup()
+
+[ura1]
+exten => s,1,Answer()
+exten => s,2,Wait(3)
+exten => s,3,background(/1)
+exten => s,4,background(/2)
+exten => s,5,background(/3)
+exten => s,6,background(/4)
+exten => s,7,background(/5)
+exten => s,8,background(/6)
+exten => s,9,background(/7)
+
+
+
+
+
+
+
+;#############################################################################################################

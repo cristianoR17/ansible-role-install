@@ -1,0 +1,76 @@
+#!/usr/bin/php5 -q
+<?php
+define("HOST","192.168.14.53");
+define("PORT","5432");
+define("DBASE","codeplan");
+define("USER","postgres");
+define("PASS","ext!001");
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+// Funcao que conecta ao banco de dados
+
+function conectar($host, $port, $db, $usuario, $senha){
+$conn = "host=".$host." port=".$port." dbname=".$db." user=".$usuario." password=".$senha;
+$acesso = pg_connect($conn) or die("O Servidor de Banco de Dados não está disponível --> " . pg_last_error($conn)); 
+}
+
+conectar(HOST, PORT, DBASE, USER, PASS);
+write("GET VARIABLE COD_AGENTE");
+$c = read();
+$cd_agente = substr($c,14);
+$cd_agente = substr($cd_agente,0,-1);
+
+write("GET VARIABLE DT_I");
+$c = read();
+$hr_inicial = substr($c,14);
+$hr_inicial = substr($hr_inicial,0,-1);
+$hr_inicial = substr($hr_inicial,0,4).'-'.substr($hr_inicial,4,2).'-'.substr($hr_inicial,6,2).' '.substr($hr_inicial,9,2).':'.substr($hr_inicial,11,2).':'.substr($hr_inicial,13,2);
+
+echo "VERBOSE \"$cd_agente\" \n";
+echo "VERBOSE \"$hr_inicial\" \n";
+
+$query = "update agente_eventos set dt_final = '$hr_final' where cd_agente = '$cd_agente' and dt_final is null" 
+$query_result = pg_query($query) or die("ERRO");
+//$result = pg_fetch_result($query_result,0,'cd_campanha');
+//echo "VERBOSE \" $result \" \n";
+//echo "VERBOSE \" $result\" \n";
+//echo ("SET VARIABLE CAMP '$result'");
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

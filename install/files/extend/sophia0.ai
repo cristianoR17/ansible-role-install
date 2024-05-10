@@ -1,0 +1,85 @@
+name;your:My name is Sophia:1:0:1000
+nome;voce;seu:meu nome é sophia:1:0
+nome;voce;seu;e:meu nome é sophia:1:0
+nome;voce;teu:meu nome é sophia:1:0
+nome;voce:meu nome é sophia:1:0
+computador;resetando:Verificar se não tem virus e ligar no suporte:1:0
+ura;problemas:Problemas na URA ligar para o Flavio:1:0
+nome;pai;geovane;costa;do:paulo de jesus costa:1:0
+nome;pai;giovani;costa;do:paulo de jesus costa:1:0
+nome;pai;aline:luiz eloa de almeida:1:0
+nome;pai:paulo vinicius:1:0
+nome;pai;do:paulo vinicius:1:0
+nome;pai;do:paulo vinicius:1:0
+nome;pai;do;seu:paulo vinicius:1:0
+nome;pai;dele;seu:paulo vinicius:1:0
+nome;pai;ele;seu:paulo vinicius:1:0
+nome;pai;e;seu:paulo vinicius:1:0
+nome;pai;teu:paulo vinicius:1:0
+chamado;comunix:para abri um chamdo tenho em maos o numero do contrato:1:0
+boleto;pagameto:Para receber o código de barras via SMS digite o número do seu telefone com DDD + palavra SMS.:1:0
+boleto;atrasado:Para receber o código de barras via SMS digite o número do seu telefone com DDD + palavra SMS.:1:0
+nome;mae;aline:carmem olinda pessoa de almeida:1:0
+nome;mae;geovani:joana abadia de souza:1:0
+sms;boleto:boleto_sms:1:0
+nome;do:nome:1:0
+nome;da:nome:1:0
+nome;meu:nome:1:0
+thanks:Welcome:1:0
+thank;you:Welcome:1:0
+problema:problema resolvido:1:0:1
+idade:idade:1:0
+cardapio:docs.comunix.net.br/images/cardapio.jpg:1:0
+nascimento:dt_nascimento:1:0
+nasceu:dt_nascimento:1:0
+
+previsao;tempo:previsao:1:0
+tempo:previsao:1:0
+
+//Capital
+capital:vl_capital:1:0
+qual;capital:vl_capital:1:0
+
+//Moeda
+moeda:vl_moeda:1:0
+dinheiro:vl_moeda:1:0
+
+//dia
+dia;hoje:dia_mes:1:0
+dia;mes:dia_mes:1:0
+dia;semana:dia_atual:1:0
+dia;semana;da:dia_atual:1:0
+
+
+mes;qual:nome_mes:1:0
+mes;que:nome_mes:1:0
+mes;do;nome:nome_mes:1:0
+
+
+bom;dia:saudacao:1:0
+boa;tarde:saudacao:1:0
+boa;noite:saudacao:1:0
+
+//CPF
+cpf;consultar:cpf:1:0
+cpf;cadastrar:cadastrar:1:0
+cpf:cpf:1:1
+
+quanto:conta:1:0
+quanto;e:conta:1:0
+
+dolar;sms:dolar_sms:1:0
+dolar;enviar:dolar_sms:1:0
+
+dolar;enviar;cotacao:dolar_sms:1:0
+dolar;enviar;cotacao;hoje;dia:dolar_sms:1:0
+
+dolar:dolar:1:1
+dolar;cotacao:dolar:1:0
+dolar;cotacao;dia;hoje:dolar:1:0
+
+pegar;numeros;numero:numero
+pega;numeros;numero:numero
+repetir;numeros;numero:numero
+captura;numeros;numero:numero
+capturar;numeros;numero:numero

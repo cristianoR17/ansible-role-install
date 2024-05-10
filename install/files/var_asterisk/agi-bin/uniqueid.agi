@@ -1,0 +1,39 @@
+#!/usr/bin/php -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0);
+
+$cd_chamada = trim($argv[1]);
+
+
+$v = explode(".",$cd_chamada);
+$qtd=strlen($v[1]);
+
+
+//if ($qtd==1)
+// $left='000'.$v[1].$site;
+
+//if ($qtd==2)
+// $left='00'.$v[1].$site;
+
+
+//if ($qtd==3)
+// $left='0'.$v[1].$site;
+
+$left=$v[1];
+
+
+$cd_chamada = $v[0].$left;
+echo "VERBOSE \"NEW_UNIQUEID: $cd_chamada\" \n";
+echo("SET VARIABLE NEW_UNIQUEID $cd_chamada \n");
+#echo "VERBOSE \"NEW_UNIQUEID: $cd_chamada\" \n";
+read();
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

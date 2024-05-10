@@ -1,0 +1,45 @@
+#!/usr/bin/php -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0);
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+$debug = true;
+$exten = $argv[1];
+$cti_send = $argv[2];
+$dados = explode('-',$exten);
+$cti = $dados[1];
+$dados[1] = 0;
+print_r($dados);
+
+$unqueid_trans = $dados[3];
+
+$unqueid_trans = substr($unqueid_trans,2);
+
+$dados[3] = $unqueid_trans;
+
+if ($cti_send != ''){
+	$dados[1] = $cti_send;
+} else {
+	$dados[1] = 0;
+
+}
+$dados = implode('-',$dados);
+
+
+$cri_arr = explode("_",$cti);
+
+
+$cpf = $cri_arr[1];
+$nome = $cri_arr[2];
+
+echo "VERBOSE \"GetContaRamal => $dados \" \n";
+echo ("SET VARIABLE GetContaRamal $dados \n");
+echo ("SET VARIABLE CTI $cti \n");
+echo ("SET VARIABLE NOME $nome \n");
+echo ("SET VARIABLE CPF $cpf \n");
+
+exit;
+?>

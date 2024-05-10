@@ -1,0 +1,100 @@
+#!/usr/bin/php5 -q
+<?php
+require('conexao.php');
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+// Funcao que conecta ao banco de dados
+
+function conectar($host, $port, $db, $usuario, $senha){
+$conn = "host=".$host." port=".$port." dbname=".$db." user=".$usuario." password=".$senha;
+$acesso = pg_connect($conn) or die("O Servidor de Banco de Dados não está disponível --> " . pg_last_error($conn)); 
+}
+
+conectar(HOST, PORT, DBASE, USER, PASS);
+
+write("GET VARIABLE RAMAL");
+$c = read();
+$ramal = substr($c,14);
+$ramal = substr($ramal,0,-1);
+
+write("GET VARIABLE CONTA");
+$c = read();
+$conta = substr($c,14);
+$conta = substr($conta,0,-1);
+
+write("GET VARIABLE SENHA");
+$c = read();
+$senha = substr($c,14);
+$senha = substr($senha,0,-1);
+
+$query = "SELECT * FROM public.tb036_tr_ramal_sip_agente where name = $ramal";
+$query_result = pg_query($query) or die("ERRO");
+$coagente = pg_fetch_result($query_result,0,co_agente);
+
+if ($coagente <= 0)
+  $result = "ERR_001";
+
+if ($result!="ERR_001")
+{
+ $query = "SELECT sg_cifra from vw003_agente_servico WHERE co_agente  = '$coagente'"; 
+ $query_result = pg_query($query) or die("ERRO");
+
+ $rows = pg_num_rows($query_result);
+
+ echo "VERBOSE \"$rows\" \n";
+
+if ($rows <= 0)
+  $result = "ERR 002";
+
+ for ($i=0;$i<$rows;$i++){
+  $result = pg_fetch_result($query_result,$i,'sg_cifra');
+  write("EXEC RemoveQueueMember $result|SIP/$ramal");
+  echo "VERBOSE \"Removendo do servico: $result\" \n";
+ } 
+ //Deleta registros das tabelas real-time
+ $query = "DELETE FROM tb037_tr_ramal WHERE name = '$ramal'";
+ $query_result = pg_query($query) or die("ERRO");
+ $query = "DELETE FROM tb036_tr_ramal_sip_agente WHERE co_agente = '$coagente'";
+ $query_result = pg_query($query) or die("ERRO");
+ $result = 'MSG_002';
+}
+
+echo ("SET VARIABLE LOGIN '$result'");
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

@@ -1,0 +1,147 @@
+#!/usr/bin/php4 -q
+<?php
+
+require('nusoap.php');
+require('xml.functions.php');
+
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+
+//write("GET VARIABLE RENAVAM");
+//$c = read();
+//$cd_agente = substr($c,14);
+//$cd_agente = substr($cd_agente,0,-1);
+fclose($in);
+fclose($stdlog);
+exit;
+
+$msg="828817642";        
+        $wcClient  = new soapclient('http://200.252.150.7/UraOS/Ura?WSDL','wsdl');
+        $Response = $wcClient->call('consultaDebitoVeiculo', array($msg));
+        if ($wcClient->getError()) {
+            $descricaoResposta = "FALHA MF DETRAN";
+        }
+        else {
+            $xResponse = xmlize($Response);
+            $dados = $xResponse["saida"]["#"];
+
+            if ($dados["descricao-reposta"]['0']['#']=="")
+              $descricaoResposta = "FALHA MF DETRAN";
+            else
+              $descricaoResposta = $dados["descricao-reposta"]['0']['#'];
+
+            $dados = $dados["dados"]['0']["#"];
+            $seguro = $dados["seguro"]['0']['#']*100;
+            $multa  = $dados["multa"]['0']['#']*100;
+            $licenc = $dados["licenciamento"]['0']['#']*100;
+            $taxa = $dados["taxa"]['0']['#']*100;
+            $ipva_vencer = $dados["ipva-vencer"]['0']['#']*100;
+            $ipva_vencido = $dados["ipva-vencido"]['0']['#']*100;
+        }
+
+if ($licenc>0){
+ $licenc = number_format($licenc/100, 2, ',', '');
+ $licencreal = substr($licenc,0,strrpos($licenc,","));
+ $licenccentavos = substr($licenc,strrpos($licenc,",")+1,10);
+}
+else{
+ $licencreal = '0';
+ $licenccentavos = '0';
+}
+
+if ($seguro>0){
+ $seguro = number_format($seguro/100, 2, ',', '');
+ $seguroreal = substr($seguro,0,strrpos($seguro,","));
+ $segurocentavos = substr($seguro,strrpos($seguro,",")+1,10);
+}
+else{
+ $seguroreal = '0';
+ $segurocentavos = '0';
+}
+
+
+if ($multa>0){
+ $multa = number_format($multa/100, 2, ',', '');
+ $multareal = substr($multa,0,strrpos($multa,","));
+ $multacentavos = substr($multa,strrpos($multa,",")+1,10);
+}
+else{
+ $multareal = '0';
+ $multacentavos = '0';
+}
+
+if ($taxa>0){
+ $taxa = number_format($taxa/100, 2, ',', '');
+ $taxareal = substr($taxa,0,strrpos($taxa,","));
+ $taxacentavos = substr($taxa,strrpos($taxa,",")+1,10);
+}
+else{
+ $taxareal = '0';
+ $taxacentavos = '0';
+}
+
+if ($ipva_vencer>0){
+ $ipva_vencer = number_format($ipva_vencer/100, 2, ',', '');
+ $ipva_vencerreal = substr($ipva_vencer,0,strrpos($ivpa_vencer,","));
+ $ipva_vencercentavos = substr($ipva_vencer,strrpos($ipva_vencer,",")+1,10);
+}
+else{
+ $ipva_vencerreal = '0';
+ $ipva_vencercentavos = '0';
+}
+
+if ($ipva_vencido>0){
+ $ipva_vencido = number_format($ipva_vencido/100, 2, ',', '');
+ $ipva_vencidoreal = substr($ipva_vencido,0,strrpos($ipva_vencido,","));
+ $ipva_vencidocentavos = substr($ipva_vencido,strrpos($ipva_vencido,",")+1,10);
+}
+else{
+ $ipva_vencidoreal = '0';
+ $ipva_vencidocentavos = '0';
+}
+
+echo "VERBOSE \" $descricaoResposta \" \n";
+echo "VERBOSE \"SEGURO: $seguro => Reais: $seguroreal centavos $segurocentavos \"\n";
+echo "VERBOSE \"MULTA: $multa => Reais $multareal centavos $multacentavos \"\n";
+echo "VERBOSE \"LICENCIAMENTO: $licenc => Reais $licencreal centavos $licenccentavos \"\n";
+echo "VERBOSE \"TAXA: $taxa => Reais $taxareal centavos $taxacentavos \" \n";
+echo "VERBOSE \"IPVA A VENCER $ipva_vencer => Reais $ipva_vencerreal centavos $ipva_vencercentavos \"\n";
+echo "VERBOSE \"IPVA VENCIDO $ipva_vencido => Reais $ipva_vencidoreal centavos $ipva_vencidocentavos \"\n";
+
+
+//fclose($in);
+//fclose($stdlog);
+//exit;
+
+?>

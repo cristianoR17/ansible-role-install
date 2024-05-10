@@ -1,0 +1,915 @@
+[general]
+
+static=yes
+writeprotect=yes
+autofallthrough=no
+clearglobalvars=no
+proorityjumping=no
+
+[globals]
+REAL = 0 
+CENT = 0
+RETORNO = 0
+DEBITOS = 0
+INEXISTENTE = 1 
+EXEAGI = 0
+CONTEXTO = 0
+RDOMINIO = 0
+BADM = 0
+CPF = 0
+TELEFONE = 0
+CEP = 0
+IDREGIAO = 0
+DT_INICIAL = 0
+DT_FINAL = 0
+COD_MENU = 0 
+COD_OPCAO = 0
+[default]
+
+;Eventos de login e logout
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+;Login
+exten => *71,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *71,2,Set(COD_EVENTO=71)
+exten => *71,3,Set(DT_I=${TIMESTAMP})
+exten => *71,4,agi(agente_eventos_logout.agi)
+exten => *71,5,agi(agente_eventos.agi)
+exten => *71,6,AgentCallBackLogin(${CHANNEL:5:6}|${CHANNEL:5:6}|${CALLERIDNUM})
+exten => *71,7,UnPauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *71,8,Hangup
+
+;Logout
+exten => *85,1,Answer()
+exten => *85,2,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *85,3,Set(DT_I=${TIMESTAMP})
+exten => *85,4,Set(COD_EVENTO=71)
+exten => *85,5,agi(agente_eventos_logout.agi)
+exten => *85,6,agi(agente_eventos_unpause.agi)
+exten => *85,7,System(asterisk -rx "agent logoff Agent/${CHANNEL:5:6}")
+exten => *85,8,PlayBack(prog_aceita)
+exten => *85,9,Hangup
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+exten => *72,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *72,2,Set(COD_EVENTO=72)
+exten => *72,3,Set(DT_I=${TIMESTAMP})
+exten => *72,4,agi(agente_eventos_unpause.agi)
+exten => *72,5,agi(agente_eventos_pause.agi)
+exten => *72,6,agi(agente_eventos.agi)
+exten => *72,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *72,8,PlayBack(prog_aceita)
+exten => *72,9,Hangup
+
+exten => *73,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *73,2,Set(COD_EVENTO=73)
+exten => *73,3,Set(DT_I=${TIMESTAMP})
+exten => *73,4,agi(agente_eventos_unpause.agi)
+exten => *73,5,agi(agente_eventos_pause.agi)
+exten => *73,6,agi(agente_eventos.agi)
+exten => *73,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *73,8,PlayBack(prog_aceita)
+exten => *73,9,Hangup
+
+exten => *74,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *74,2,Set(COD_EVENTO=74)
+exten => *74,3,Set(DT_I=${TIMESTAMP})
+exten => *74,4,agi(agente_eventos_unpause.agi)
+exten => *74,5,agi(agente_eventos_pause.agi)
+exten => *74,6,agi(agente_eventos.agi)
+exten => *74,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *74,8,PlayBack(prog_aceita)
+exten => *74,9,Hangup
+
+exten => *75,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *75,2,Set(COD_EVENTO=75)
+exten => *75,3,Set(DT_I=${TIMESTAMP})
+exten => *75,4,agi(agente_eventos_unpause.agi)
+exten => *75,5,agi(agente_eventos_pause.agi)
+exten => *75,6,agi(agente_eventos.agi)
+exten => *75,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *75,8,PlayBack(prog_aceita)
+exten => *75,9,Hangup
+
+exten => *76,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *76,2,Set(COD_EVENTO=76)
+exten => *76,3,Set(DT_I=${TIMESTAMP})
+exten => *76,4,agi(agente_eventos_unpause.agi)
+exten => *76,5,agi(agente_eventos_pause.agi)
+exten => *76,6,agi(agente_eventos.agi)
+exten => *76,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *76,8,PlayBack(prog_aceita)
+exten => *76,9,Hangup
+
+exten => *77,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *77,2,Set(COD_EVENTO=77)
+exten => *77,3,Set(DT_I=${TIMESTAMP})
+exten => *77,4,agi(agente_eventos_unpause.agi)
+exten => *77,5,agi(agente_eventos_pause.agi)
+exten => *77,6,agi(agente_eventos.agi)
+exten => *77,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *77,8,PlayBack(prog_aceita)
+exten => *77,9,Hangup
+
+exten => *78,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *78,2,Set(COD_EVENTO=78)
+exten => *78,3,Set(DT_I=${TIMESTAMP})
+exten => *78,4,agi(agente_eventos_unpause.agi)
+exten => *78,5,agi(agente_eventos_pause.agi)
+exten => *78,6,agi(agente_eventos.agi)
+exten => *78,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *78,8,PlayBack(prog_aceita)
+exten => *78,9,Hangup
+
+exten => *79,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *79,2,Set(COD_EVENTO=79)
+exten => *79,3,Set(DT_I=${TIMESTAMP})
+exten => *79,4,agi(agente_eventos_unpause.agi)
+exten => *79,5,agi(agente_eventos_pause.agi)
+exten => *79,6,agi(agente_eventos.agi)
+exten => *79,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *79,8,PlayBack(prog_aceita)
+exten => *79,9,Hangup
+
+exten => *80,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *80,2,Set(COD_EVENTO=80)
+exten => *80,3,Set(DT_I=${TIMESTAMP})
+exten => *80,4,agi(agente_eventos_unpause.agi)
+exten => *80,5,agi(agente_eventos_pause.agi)
+exten => *80,6,agi(agente_eventos.agi)
+exten => *80,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *80,8,PlayBack(prog_aceita)
+exten => *80,9,Hangup
+
+exten => *81,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *81,2,Set(COD_EVENTO=81)
+Exten => *81,3,Set(DT_I=${TIMESTAMP})
+exten => *81,4,agi(agente_eventos_unpause.agi)
+exten => *81,5,agi(agente_eventos_pause.agi)
+exten => *81,6,agi(agente_eventos.agi)
+exten => *81,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *81,8,PlayBack(prog_aceita)
+exten => *81,9,Hangup
+
+exten => *82,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *82,2,Set(COD_EVENTO=82)
+exten => *82,3,Set(DT_I=${TIMESTAMP})
+exten => *82,4,agi(agente_eventos_unpause.agi)
+exten => *82,5,agi(agente_eventos_pause.agi)
+exten => *82,6,agi(agente_eventos.agi)
+exten => *82,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *82,8,PlayBack(prog_aceita)
+exten => *82,9,Hangup
+
+exten => *83,1,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *83,2,Set(COD_EVENTO=83)
+exten => *83,3,Set(DT_I=${TIMESTAMP})
+exten => *83,4,agi(agente_eventos_unpause.agi)
+exten => *83,5,agi(agente_eventos_pause.agi)
+exten => *83,6,agi(agente_eventos.agi)
+exten => *83,7,PauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *83,8,PlayBack(prog_aceita)
+exten => *83,9,Hangup
+
+;Tirar da pausa
+exten => *84,1,Answer()
+exten => *84,2,Set(COD_AGENTE=${CHANNEL:5:6})
+exten => *84,3,Set(DT_I=${TIMESTAMP})
+exten => *84,4,agi(agente_eventos_unpause.agi)
+exten => *84,5,UnPauseQueueMember(|Agent/${CHANNEL:5:6})
+exten => *84,6,PlayBack(prog_aceita)
+exten => *84,9,Hangup
+
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Ligacoes internas entre agentes
+;///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+exten => _4.,1,Set(ID=${UNIQUEID})
+exten => _4.,2,Set(COD_AGENTE=${CHANNEL:6:6})
+exten => _4.,3,agi(cdr_queue_dial.agi)
+exten => _4.,4,Dial(IAX2/${EXTEN},60)
+exten => _4.,5,Gotoif($[${DIALSTATUS} = 'CHANUNAVAIL']?6:11)
+exten => _4.,6,System(asterisk -rx "agent logoff Agent/${CHANNEL:6:6}")
+exten => _4.,7,Set(COD_AGENTE=${CHANNEL:6:6})
+exten => _4.,8,Set(DT_I=${TIMESTAMP})
+exten => _4.,9,agi(agente_eventos_logout.agi)
+exten => _4.,10,agi(agente_eventos_unpause.agi)
+exten => _4.,11,Set(COD_AGENTE=${CHANNEL:6:6})
+exten => _4.,12,agi(alarme.agi)
+exten => _4.,13,Hangup
+
+;Cifras externas
+;/////////////////////////////////////////////////////////////////////////////////////////////////////
+;Servico Detran 
+exten => 2000,1,DgCollectCallBlock()
+exten => 2000,2,Answer()
+exten => 2000,3,Goto(mn_principal,s,1)
+
+;Servico pesquisa
+exten => 7070,1,Answer()
+exten => 7070,2,Goto(mn_pesquisa,s,1)
+
+;supervisor sesi/senai 
+[1002]
+include => default
+include => 1001
+
+;comandos dos supervisores
+;///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Logout agente
+exten => _*91.,1,Answer()
+exten => _*91.,2,Set(COD_AGENTE=${EXTEN:3})
+exten => _*91.,3,Set(DT_I=${TIMESTAMP})
+exten => _*91.,4,agi(agente_eventos_logout.agi)
+exten => _*91.,5,System(asterisk -rx "agent logoff Agent/${EXTEN:3}")
+exten => _*91.,6,PlayBack(prog_aceita)
+exten => _*91.,7,Hangup
+
+;Pausar agente
+exten => _*92.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*92.,2,Set(COD_EVENTO=72)
+exten => _*92.,3,Set(DT_I=${TIMESTAMP})
+exten => _*92.,4,agi(agente_eventos_unpause.agi)
+exten => _*92.,5,agi(agente_eventos_pause.agi)
+exten => _*92.,6,agi(agente_eventos.agi)
+exten => _*92.,7,PauseQueueMember(|Agent/${EXTEN:3})
+exten => _*92.,8,PlayBack(prog_aceita)
+exten => _*92.,9,Hangup
+
+;Tirar agente da pausa
+exten => _*93.,1,Set(COD_AGENTE=${EXTEN:3})
+exten => _*93.,2,Set(DT_I=${TIMESTAMP})
+exten => _*93.,3,agi(agente_eventos_unpause.agi)
+exten => _*93.,4,UnPauseQueueMember(|Agent/${EXTEN:3})
+exten => _*93.,5,PlayBack(prog_aceita)
+exten => _*93.,6,Hangup
+
+;Monitorar agente
+exten => _*94.,1,chanspy(agent/${EXTEN:3})
+
+;Monitorar ramal
+exten => _*95.,1,chanspy(SIP/${EXTEN:3})
+
+;Desativar alarme
+exten => _*96.,1,Answer()
+exten => _*96.,2,Set(COD_AGENTE=${EXTEN:3})
+exten => _*96.,3,agi(un_alarme.agi)
+exten => _*96.,4,PlayBack(prog_aceita)
+exten => _*96.,5,Hangup
+
+;///////////////////////////////////////////////////////////////////////////////////////////////////////
+;Operador SESI 
+[1001]
+include => default
+exten => _0[0-9].,1,Answer
+exten => _0[0-9].,2,Set(OPCAO=${CHANNEL:5:6})
+exten => _0[0-9].,3,agi(campanha.agi)
+exten => _0[0-9].,4,GotoIf($["${CAMP:1:4}" = "9999"]?16:5))
+exten => _0[0-9].,5,Set(COD=${CAMP:1:4})
+exten => _0[0-9].,6,Set(ID=${UNIQUEID})
+exten => _0[0-9].,7,agi(login.agi)
+exten => _0[0-9].,8,GotoIf($["${STATUS:1:2}" = "OKOO"]?17:9))
+exten => _0[0-9].,9,agi(campanha_cdr.agi)
+exten => _0[0-9].,10,Set(CALLFILENAME1=/var/www/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:5:6}/)
+exten => _0[0-9].,11,Set(CALLFILENAME2=${CALLFILENAME1}${TIMESTAMP:9:10}-${EXTEN:1})
+exten => _0[0-9].,12,Set(LI=http://sibspbx001.call.br/gravacoes/${TIMESTAMP:0:4}-${TIMESTAMP:4:2}-${TIMESTAMP:6:2}/${CHANNEL:5:6}/${TIMESTAMP:9:10}-${EXTEN:1}.WAV)
+exten => _0[0-9].,13,agi(link_grav.agi)
+exten => _0[0-9].,14,Monitor(wav49,${CALLFILENAME2},m)
+exten => _0[0-9].,15,Dial(Dgv/g1/${EXTEN:1},60,tT)
+exten => _0[0-9].,16,Hangup
+exten => _0[0-9].,17,goto(default,*71,1)
+;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+;Contextos de servicos / ura
+[mn_principal]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(DT_INICIAL=${TIMESTAMP})
+exten => s,4,Set(COD_MENU=0)
+exten => s,5,Set(COD_OPCAO='s')
+exten => s,6,Set(DT_FINAL=${TIMESTAMP})
+exten => s,7,agi(menu_opcao.agi)
+exten => s,8,Wait(2)
+exten => s,9,PlayBack(/var/lib/asterisk/sesi/mn_inicial)
+exten => s,10,SetMusicOnHold(default)
+exten => s,11,DigitTimeout,5
+exten => s,12,ResponseTimeout,4
+exten => s,13,Background(/var/lib/asterisk/sesi/mn_principal)
+
+
+;Opcao 1 SESI
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(mn_sesi,s,1)
+
+;Opcao 2 SENAI
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(mn_senai,s,1)
+
+exten => 9,1,Dial(IAX2/455555)
+exten => 9,2,Hangup()
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} >= 0 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_principal,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} >= 1 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_principal,s,3)
+exten => i,7,goto(sesi,s,1)
+
+[mn_sesi]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=1)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,4
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_sesi)
+
+;Opcao 1 
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(mn_sesi_1_1,s,1)
+
+;Opcao 2 
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(mn_sesi_1_2,s,1)
+
+
+;Opcao 3 
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(mn_sesi_1_3,s,1)
+
+;Opcao 4 
+exten => 4,1,Answer()
+exten => 4,2,Set(COD_OPCAO=4)
+exten => 4,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 4,4,agi(menu_opcao.agi)
+exten => 4,5,goto(mn_sesi_1_4,s,1)
+
+
+;Opcao 5 
+exten => 5,1,Answer()
+exten => 5,2,Set(COD_OPCAO=5)
+exten => 5,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 5,4,agi(menu_opcao.agi)
+exten => 5,5,goto(mn_sesi_1_5,s,1)
+
+;Opcao 6
+exten => 6,1,Answer()
+exten => 6,2,Set(COD_OPCAO=6)
+exten => 6,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 6,4,agi(menu_opcao.agi)
+exten => 6,5,goto(sesi,s,1)
+
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_sesi,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_sesi,s,3)
+exten => i,7,goto(sesi,s,1)
+
+
+[mn_sesi_1_1]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=11)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,4
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_sesi_1_1)
+
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(sesi,s,1)
+
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(sesi,s,1)
+
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(sesi,s,1)
+
+exten => 4,1,Answer()
+exten => 4,2,Set(COD_OPCAO=4)
+exten => 4,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 4,4,agi(menu_opcao.agi)
+exten => 4,5,goto(sesi,s,1)
+
+exten => 5,1,Answer()
+exten => 5,2,Set(COD_OPCAO=5)
+exten => 5,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 5,4,agi(menu_opcao.agi)
+exten => 5,5,goto(sesi,s,1)
+
+exten => 6,1,Answer()
+exten => 6,2,Set(COD_OPCAO=6)
+exten => 6,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 6,4,agi(menu_opcao.agi)
+exten => 6,5,goto(sesi,s,1)
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_sesi_1_1,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_sesi_1_1,s,3)
+exten => i,7,goto(sesi,s,1)
+
+
+[mn_sesi_1_2]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=12)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,4
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_sesi_1_2)
+
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(sesi,s,1)
+
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(sesi,s,1)
+
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(sesi,s,1)
+
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_sesi_1_2,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_sesi_1_2,s,3)
+exten => i,7,goto(sesi,s,1)
+
+[mn_sesi_1_3]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=13)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,10
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_sesi_1_3)
+
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(sesi,s,1)
+
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(sesi,s,1)
+
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(sesi,s,1)
+
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_sesi_1_3,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_sesi_1_3,s,3)
+exten => i,7,goto(sesi,s,1)
+
+[mn_sesi_1_4]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=14)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,4
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_sesi_1_4)
+
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(sesi,s,1)
+
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(sesi,s,1)
+
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(sesi,s,1)
+
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_sesi_1_4,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_sesi_1_4,s,3)
+exten => i,7,goto(sesi,s,1)
+
+[mn_sesi_1_5]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=15)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,4
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_sesi_1_5)
+
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(sesi,s,1)
+
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(sesi,s,1)
+
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(sesi,s,1)
+
+exten => 4,1,Answer()
+exten => 4,2,Set(COD_OPCAO=4)
+exten => 4,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 4,4,agi(menu_opcao.agi)
+exten => 4,5,goto(sesi,s,1)
+
+
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_sesi_1_5,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_sesi_1_5,s,3)
+exten => i,7,goto(sesi,s,1)
+
+
+[mn_senai]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=2)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,5
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_senai)
+
+;Opcao 1 
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(mn_senai_1_1,s,1)
+
+;Opcao 2 
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(sesi,s,1)
+
+
+;Opcao 3 
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(sesi,s,1)
+
+;Opcao 4
+exten => 4,1,Answer()
+exten => 4,2,Set(COD_OPCAO=4)
+exten => 4,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 4,4,agi(menu_opcao.agi)
+exten => 4,5,goto(sesi,s,1)
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_senai,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_senai,s,3)
+exten => i,7,goto(sesi,s,1)
+
+
+[mn_senai_1_1]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(COD_MENU=21)
+exten => s,4,Set(DT_FINAL=${TIMESTAMP})
+exten => s,5,agi(menu_opcao.agi)
+exten => s,6,Wait(2)
+exten => s,7,SetMusicOnHold(default)
+exten => s,8,DigitTimeout,5
+exten => s,9,ResponseTimeout,4
+exten => s,10,Background(/var/lib/asterisk/sesi/mn_senai_1_1)
+
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,goto(sesi,s,1)
+
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,goto(sesi,s,1)
+
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=3)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,goto(sesi,s,1)
+
+exten => 4,1,Answer()
+exten => 4,2,Set(COD_OPCAO=4)
+exten => 4,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 4,4,agi(menu_opcao.agi)
+exten => 4,5,goto(sesi,s,1)
+
+exten => 5,1,Answer()
+exten => 5,2,Set(COD_OPCAO=5)
+exten => 5,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 5,4,agi(menu_opcao.agi)
+exten => 5,5,goto(sesi,s,1)
+
+exten => 6,1,Answer()
+exten => 6,2,Set(COD_OPCAO=6)
+exten => 6,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 6,4,agi(menu_opcao.agi)
+exten => 6,5,goto(sesi,s,1)
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => t,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => t,3,Set(COD_OPCAO='t')
+exten => t,4,Set(DT_FINAL=${TIMESTAMP})
+exten => t,5,agi(menu_opcao.agi)
+exten => t,6,goto(mn_senai_1_1,s,3)
+exten => t,7,goto(sesi,s,1)
+
+
+;Opcao invalida tranfere para fila informacoes
+exten => i,1,Set(repeticao=$[ ${repeticao} + 1 ])
+exten => i,2,Gotoif($[ ${repeticao} > 2 ]?7:3)
+exten => i,3,Set(COD_OPCAO='t')
+exten => i,4,Set(DT_FINAL=${TIMESTAMP})
+exten => i,5,agi(menu_opcao.agi)
+exten => i,6,goto(mn_senai_1_1,s,3)
+exten => i,7,goto(sesi,s,1)
+
+;Pesquisa de satisfaçao
+[mn_pesquisa]
+exten => s,1,Answer
+exten => s,2,set(repeticao=0)
+exten => s,3,Set(DT_INICIAL=${TIMESTAMP})
+exten => s,4,Set(COD_MENU=p)
+exten => s,5,Set(COD_OPCAO='s')
+exten => s,6,Set(DT_FINAL=${TIMESTAMP})
+exten => s,7,agi(menu_opcao.agi)
+exten => s,8,Wait(2)
+exten => s,9,SetMusicOnHold(default)
+exten => s,10,DigitTimeout,5
+exten => s,11,ResponseTimeout,4
+exten => s,12,Background(/var/lib/asterisk/sesi/mn_pesquisa)
+
+
+;Opcao 1 
+exten => 1,1,Answer()
+exten => 1,2,Set(COD_OPCAO=1)
+exten => 1,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 1,4,agi(menu_opcao.agi)
+exten => 1,5,PlayBack(/var/lib/asterisk/sesi/fr_agradece)
+exten => 1,6,Hangup()
+
+;Opcao 2 
+exten => 2,1,Answer()
+exten => 2,2,Set(COD_OPCAO=2)
+exten => 2,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 2,4,agi(menu_opcao.agi)
+exten => 2,5,PlayBack(/var/lib/asterisk/sesi/fr_agradece)
+exten => 2,6,Hangup()
+
+;Opcao 3 
+exten => 3,1,Answer()
+exten => 3,2,Set(COD_OPCAO=1)
+exten => 3,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 3,4,agi(menu_opcao.agi)
+exten => 3,5,PlayBack(/var/lib/asterisk/sesi/fr_agradece)
+exten => 3,6,Hangup()
+
+;Opcao 4
+exten => 4,1,Answer()
+exten => 4,2,Set(COD_OPCAO=2)
+exten => 4,3,Set(DT_FINAL=${TIMESTAMP})
+exten => 4,4,agi(menu_opcao.agi)
+exten => 4,5,PlayBack(/var/lib/asterisk/sesi/fr_agradece)
+exten => 4,6,Hangup()
+
+;Opcao TIMEOUT transfere para fila informacoes
+
+exten => t,1,Set(COD_OPCAO='t')
+exten => t,2,Set(DT_FINAL=${TIMESTAMP})
+exten => t,3,agi(menu_opcao.agi)
+exten => t,4,PlayBack(/var/lib/asterisk/sesi/fr_agradece)
+exten => t,5,Hangup()
+
+
+;Opcao invalida tranfere para fila informacoes
+
+exten => i,1,Set(COD_OPCAO='t')
+exten => i,2,Set(DT_FINAL=${TIMESTAMP})
+exten => i,3,agi(menu_opcao.agi)
+exten => i,4,PlayBack(/var/lib/asterisk/sesi/fr_agradece)
+exten => i,5,Hangup()
+
+
+
+;Serviço SESI
+
+[sesi]
+;Atendimento Humano 
+exten => s,1,Answer()
+exten => s,2,GotoIfTime(08:00-23:00|mon-fri|*|*?sesi_senai,s,1)
+exten => s,3,GotoIfTime(08:00-14:00|sat-sun|*|*?sesi_senai,s,1)
+exten => s,4,PlayBack(/var/lib/asterisk/sesi/fr_horario)
+exten => s,5,Hangup()
+
+[sesi_senai]
+exten => s,1,Set(CLID=${CALLERID(num)}) 
+exten => s,2,Set(ID=${UNIQUEID})
+exten => s,3,Set(FILA='q1001')
+exten => s,4,agi(opcao_fila.agi)
+exten => s,5,Queue(q1001|tThHwW|||3000)
+exten => s,6,Hangup()
+
+
+
+
+;//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

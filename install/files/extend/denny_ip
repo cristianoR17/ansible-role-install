@@ -1,0 +1,18 @@
+#!/usr/bin/php5 -q
+<?PHP
+foreach($argv as $value)
+{
+  $getCti = $value;
+}
+
+$cmd="iptables -L --line-numbers -n | grep $getCti | wc -l";
+//print($cmd);
+$a=system($cmd);
+
+for ($i=0;$i<=$a;$i++){
+ $cmd="iptables -L --line-numbers -n | grep $getCti |cut -d' ' -f1 |xargs -n 1 -i iptables -D INPUT {}";
+ system($cmd);
+}
+
+?>
+

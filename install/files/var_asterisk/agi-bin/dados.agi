@@ -1,0 +1,86 @@
+#!/usr/bin/php -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo "$line \n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+
+write("GET VARIABLE DADOS");
+$c = read();
+$dados = substr($c,14);
+$dados = substr($dados,0,-1);
+
+echo ("VERBOSE \"RESULT:================================. $c\" \n");
+
+$var = explode("-", $dados);
+
+if (($var[0]!="") && ($var[1]!="") && ($var[2]!="") && ($var[3]!="") && ($var[4]!="")  && ($var[5]!="") ) 
+ $result=1;
+else
+ $result=0;
+
+echo ("SET VARIABLE RESULT  \"$result\" \n");
+echo ("SET VARIABLE RAMAL  \"$var[0]\" \n");
+echo ("SET VARIABLE CLID  \"$var[1]\" \n");
+echo ("SET VARIABLE ID  \"$var[2]\" \n");
+echo ("SET VARIABLE FILA  \"$var[3]\" \n");
+echo ("SET VARIABLE CTI  \"$var[4]\" \n");
+echo ("SET VARIABLE USER  \"$var[5]\" \n");
+echo ("SET VARIABLE DUR  \"$var[6]\" \n");
+echo ("SET VARIABLE URA  \"$var[7]\" \n");
+echo ("SET VARIABLE DT_GRAV  \"$var[8]-$var[9]-$var[10]\" \n");
+echo ("SET VARIABLE CHANNEL_ID  \"$var[11]\" \n");
+echo ("SET VARIABLE SITE  \"$var[12]\" \n");
+
+echo ("VERBOSE \"RESULT: $result\" \n");
+echo ("VERBOSE \"RAMAL: $var[0]\" \n");
+echo ("VERBOSE \"CLID: $var[1]\" \n");
+echo ("VERBOSE \"ID: $var[2]\" \n");
+echo ("VERBOSE \"FILA: $var[3]\" \n");
+echo ("VERBOSE \"CTI: $var[4]\" \n");
+echo ("VERBOSE \"USER: $var[5]\" \n");
+echo ("VERBOSE \"DUR_QUEUE: $var[6]\" \n");
+echo ("VERBOSE \"URA: $var[7]\" \n");
+echo ("VERBOSE \"DT_GRAV: $var[8]-$var[9]-$var[10]\" \n");
+echo ("VERBOSE \"CHANNEL_ID: $var[11]\" \n");
+echo ("VERBOSE \"SITE: $var[12]\" \n");
+echo ("VERBOSE \"RAMAL_IP: $ip\" \n");
+
+
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

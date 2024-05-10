@@ -1,0 +1,75 @@
+#!/usr/bin/php5 -q
+<?php
+require('conexao.php');
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+//878787878.9898_4000
+$user='0';
+function varreduraDiretorio($uniqueid = ""){
+                $caminho = "/home/extend/join/";
+                $ponteiro  = opendir($caminho);
+                while ($nome_itens = readdir($ponteiro)) {
+                   $s[0] = 0;     
+                    if (($nome_itens != '.') && ($nome_itens != '..'))
+                                $s = explode('_',$nome_itens);
+                                if ($s[1] == $uniqueid){
+                                  return $s;   
+                                  break; 
+                                }
+                }
+                return explode('_','0_0_0');
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+write("GET VARIABLE ID");
+$c = read();
+$cd_ch = substr($c,14);
+$cd_ch = substr($cd_ch,0,-1);
+
+echo "VERBOSE \"UNIQUEID: $cd_ch\" \n";
+
+$result = varreduraDiretorio($cd_ch);
+
+echo "VERBOSE \"RAMAL: $result[0]\" \n";
+echo "VERBOSE \"USER: $result[2]\" \n";
+
+echo ("SET VARIABLE RAMAL_RESULT $result[0]");
+echo "\n";
+echo ("SET VARIABLE RAMAL_USER $result[2]");
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+
+?>
+

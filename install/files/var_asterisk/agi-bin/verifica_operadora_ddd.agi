@@ -1,0 +1,1538 @@
+#!/usr/bin/php5 -q
+<?php
+
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+//####################################################################################
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+write("GET VARIABLE PREFIXO");
+$c = read();
+$prefixo = substr($c,14);
+$prefixo = substr($prefixo,0,-1);
+
+echo "VERBOSE \" PREFIXO =>  $prefixo \" \n";
+
+$rota7 = 'SIP/vono/'; 
+$ddd=substr($prefixo,0,2);
+error_reporting (E_ALL);
+if ($prefixo!=''){
+
+if ($ddd=='61'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82') ||
+      (substr($prefixo,2,2)=='83'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85') ||
+      (substr($prefixo,2,2)=='86'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='93') ||
+      (substr($prefixo,2,2)=='95'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='12'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||				  
+      (substr($prefixo,2,2)=='92'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='13'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81')) 
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if (substr($prefixo,2,2)=='88')
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||				  
+      (substr($prefixo,2,2)=='92'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='14'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88')) 
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91')) 
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='15'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81')) 
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88')) 
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='16'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88')) 
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='93'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='17'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88')) 
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='18'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81')) 
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88')) 
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91')) 
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='19'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='84'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='95'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='21'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='69') ||
+      (substr($prefixo,2,2)=='79') ||
+	  (substr($prefixo,2,2)=='83'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='67') ||
+      (substr($prefixo,2,2)=='71') ||
+	  (substr($prefixo,2,2)=='72') ||
+	  (substr($prefixo,2,2)=='95') ||
+	  (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='62') ||
+      (substr($prefixo,2,2)=='84') ||
+	  (substr($prefixo,2,2)=='89'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='68') ||
+      (substr($prefixo,2,2)=='73') ||
+	  (substr($prefixo,2,2)=='76') ||
+	  (substr($prefixo,2,2)=='91') ||
+	  (substr($prefixo,2,2)=='94'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='22'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='97') ||
+      (substr($prefixo,2,2)=='98') ||
+	  (substr($prefixo,2,2)=='99')) 
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92')) 
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='24'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+	  (substr($prefixo,2,2)=='99')) 
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='93')) 
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='27'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97') ||
+	  (substr($prefixo,2,2)=='99')) 
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='93')) 
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='28'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='31'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='75') ||
+      (substr($prefixo,2,2)=='91') ||
+	  (substr($prefixo,2,2)=='94'))
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='95') ||
+      (substr($prefixo,2,2)=='96') ||
+	  (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='85') ||
+      (substr($prefixo,2,2)=='88') ||
+	  (substr($prefixo,2,2)=='89'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='82') ||
+      (substr($prefixo,2,2)=='83') ||
+	  (substr($prefixo,2,2)=='84'))
+     $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='32'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91')) 
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='33'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91')) 
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99')) 
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='34'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99')) 
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='35'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+    $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='37'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='38'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='41'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97') ||
+	  (substr($prefixo,2,2)=='98') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='42'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='82') ||
+      (substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='43'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='96') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='44'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='45'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='46'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='47'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='89'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='48'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+	  $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='49'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='51'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='80') ||
+      (substr($prefixo,2,2)=='95') ||
+      (substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='86'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='89') ||
+      (substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='94')) 
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='53'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='54'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='55'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97') ||
+      (substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='61'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82') ||
+	  (substr($prefixo,2,2)=='83'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85') ||
+	  (substr($prefixo,2,2)=='86'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='93') ||
+      (substr($prefixo,2,2)=='95'))
+      $rota7 = 'SIP/1000/4';
+}
+
+
+if ($ddd=='62'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='86'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='63'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84')) 
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='64'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='93'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='65'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='93'))
+       $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='66'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99')) 
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84')) 
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='67'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84')) 
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='68'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84')) 
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92'))
+       $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='69'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84')) 
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='93'))
+       $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='71'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='93'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85') ||
+	  (substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='84'))
+       $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='73'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+       $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='74'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/4';
+}
+
+
+if ($ddd=='75'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='83'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='77'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/4';
+}   
+
+if ($ddd=='79'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='81'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='95') ||
+      (substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+	  $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='89') ||
+      (substr($prefixo,2,2)=='91') ||
+	  (substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='82'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='95') ||
+      (substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='93') ||
+	  (substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/4';
+}  
+
+if ($ddd=='83'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='86') ||
+      (substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='93') ||
+	  (substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='84'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92') ||
+	  (substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='85'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='85') ||
+      (substr($prefixo,2,2)=='89'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92') ||
+	  (substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='86'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='94') ||
+      (substr($prefixo,2,2)=='95'))
+	   $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='87'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+	   $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='88'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='97') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='94'))
+	   $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='89'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='91'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='80') ||
+      (substr($prefixo,2,2)=='83') ||
+	  (substr($prefixo,2,2)=='89'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='93'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+  
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='92'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+	  $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='94'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='93'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='94'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='95'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='96'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+}
+
+if ($ddd=='97'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='96') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='98'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='87') ||
+      (substr($prefixo,2,2)=='88') ||
+	  (substr($prefixo,2,2)=='96') ||
+	  (substr($prefixo,2,2)=='99'))
+      $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+} 
+
+if ($ddd=='99'){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82'))
+      $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='91'))
+      $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='88') ||
+      (substr($prefixo,2,2)=='96') ||
+	  (substr($prefixo,2,2)=='99'))
+	  $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='84'))
+      $rota7 = 'SIP/1000/4';
+                    
+}
+
+echo "VERBOSE \" PREFIXO =>  $prefixo \" \n";
+echo ("SET VARIABLE  PREFIXO $prefixo \n");
+
+echo "VERBOSE \"ROTA7 =>  $rota7 \" \n";
+echo ("SET VARIABLE ROTA7 $rota7 \n");
+
+echo "VERBOSE \"DDD =>  $ddd \" \n";
+echo ("SET VARIABLE DDD $ddd \n");
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+?>

@@ -1,0 +1,27 @@
+#!/usr/bin/php -q
+<?PHP
+foreach($argv as $value)
+{
+  $getCti = $value;
+}
+
+$cmd="iptables -n -L |grep $getCti";
+//print($cmd);
+$a=system($cmd);
+echo "IP===>".$a."\n";
+if ($a==""){
+ $ip=$getCti;
+ $ip=str_replace("\n", '', $ip);
+ $cmd="iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT";
+ echo $cmd."\n";
+ system($cmd);
+
+ $cmd="iptables -I INPUT -s $ip -j ACCEPT";
+ echo $cmd."\n";
+ system($cmd);
+} else
+ echo "this ip is on the list \n";
+
+
+?>
+

@@ -1,0 +1,28 @@
+#!/usr/bin/php -q
+<?PHP
+foreach($argv as $value)
+{
+  $getCti = $value;
+}
+
+$value=str_replace("'", '"', $value);
+$string1 = $value;
+preg_match_all('/"([^"]+)"/', $string1, $matches);
+foreach($matches[1] as $m) {
+    //echo $m.PHP_EOL;
+}
+
+$ip=$m.PHP_EOL;
+$ip=str_replace("\n", '', $ip);
+$cmd="iptables -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT";
+echo $cmd."\n";
+system($cmd);
+
+$cmd="iptables -I INPUT -s $ip -j ACCEPT";
+echo $cmd."\n";
+system($cmd);
+
+?>
+
+
+

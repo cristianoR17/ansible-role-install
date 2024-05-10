@@ -1,0 +1,214 @@
+#!/usr/bin/php4 -q
+<?php
+
+require('nusoap.php');
+
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+function xmlize ($data, $WHITE=1) {
+
+    $data = trim($data);
+    $vals = $index = $array = array();
+    $parser = xml_parser_create();
+    xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+    xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, $WHITE);
+    xml_parse_into_struct($parser, $data, $vals, $index);
+    xml_parser_free($parser);
+
+    $i = 0; 
+
+    $tagname = $vals[$i]['tag'];
+    if ( isset ($vals[$i]['attributes'] ) )
+    {
+        $array[$tagname]['@'] = $vals[$i]['attributes'];
+    } else {
+        $array[$tagname]['@'] = array();
+    }
+
+    $array[$tagname]["#"] = xml_depth($vals, $i);
+
+    return $array;
+}
+
+function xml_depth($vals, &$i) { 
+    $children = array(); 
+
+    if ( isset($vals[$i]['value']) )
+    {
+        array_push($children, $vals[$i]['value']);
+    }
+
+    while (++$i < count($vals)) { 
+
+        switch ($vals[$i]['type']) { 
+
+           case 'open': 
+
+                if ( isset ( $vals[$i]['tag'] ) )
+                {
+                    $tagname = $vals[$i]['tag'];
+                } else {
+                    $tagname = '';
+                }
+
+                if ( isset ( $children[$tagname] ) )
+                {
+                    $size = sizeof($children[$tagname]);
+                } else {
+                    $size = 0;
+                }
+
+                if ( isset ( $vals[$i]['attributes'] ) ) {
+                    $children[$tagname][$size]['@'] = $vals[$i]["attributes"];
+                }
+
+                $children[$tagname][$size]['#'] = xml_depth($vals, $i);
+
+            break; 
+
+
+            case 'cdata':
+                array_push($children, $vals[$i]['value']); 
+            break; 
+
+            case 'complete': 
+                $tagname = $vals[$i]['tag'];
+
+                if( isset ($children[$tagname]) )
+                {
+                    $size = sizeof($children[$tagname]);
+                } else {
+                    $size = 0;
+                }
+
+                if( isset ( $vals[$i]['value'] ) )
+                {
+                    $children[$tagname][$size]["#"] = $vals[$i]['value'];
+                } else {
+                    $children[$tagname][$size]["#"] = '';
+                }
+
+                if ( isset ($vals[$i]['attributes']) ) {
+                    $children[$tagname][$size]['@']
+                                             = $vals[$i]['attributes'];
+                }			
+
+            break; 
+
+            case 'close':
+                return $children; 
+            break;
+        } 
+
+    } 
+
+	return $children;
+
+}
+
+
+function traverse_xmlize($array, $arrName = "array", $level = 0) {
+
+    foreach($array as $key=>$val)
+    {
+        if ( is_array($val) )
+        {
+            traverse_xmlize($val, $arrName . "[" . $key . "]", $level + 1);
+        } else {
+            $GLOBALS['traverse_array'][] = '$' . $arrName . '[' . $key . '] = "' . $val . "\"\n";
+        }
+    }
+
+    return 1;
+}
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+$vetor[0] = '02';
+
+//Captura cnh
+write("GET VARIABLE CNH");
+$c = read();
+$vetor[1] = substr($c,14);
+$vetor[1] = substr($vetor[1],0,-1);
+echo "VERBOSE \"$vetor[1]\" \n";
+
+
+
+
+        $wcClient  = new soapclient('http://200.252.150.7/UraOS/Ura?WSDL','wsdl');
+        $Response = $wcClient->call('consultaPontuacao', $vetor/*array($msg)*/);
+        if ($wcClient->getError()) {
+            $descricaoResposta = "FALHA MF DETRAN";
+        }
+        else {
+            $xResponse = xmlize($Response);
+            $dados = $xResponse["saida"]["#"];
+
+            if ($dados["descricao-reposta"]['0']['#']=="")
+              $descricaoResposta = "FALHA";
+            else
+             $descricaoResposta = $dados["descricao-reposta"]['0']['#'];
+             $dados = $dados["dados"]['0']["#"]; 
+             $qtdPontos=($dados["quantidade-pontos"]['0']['#']);
+
+       }
+
+echo ("SET VARIABLE PONTOS  \"$qtdPontos\" \n");
+
+
+$inexistentes = 1;
+$inexistenten = 0;
+
+//Veiculo inexistente
+if (substr($descricaoResposta,4,11) == "Inexistente") 
+ echo ("SET VARIABLE INEXISTENTE  \"$inexistentes\" \n");
+else
+ echo ("SET VARIABLE INEXISTENTE  \"$inexistenten\" \n");
+//Falha na consulta
+
+$falhas = 1;
+$falhan = 0;
+
+if (substr($descricaoResposta,0,5) == "FALHA")
+ echo ("SET VARIABLE FALHA  \"$falhas\" \n");
+else
+ echo ("SET VARIABLE FALHA  \"$falhan\" \n");
+
+echo "VERBOSE \"$descricaoResposta\" \n";
+echo "VERBOSE \"PONTUACAO: $qtdPontos\"\n";
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>

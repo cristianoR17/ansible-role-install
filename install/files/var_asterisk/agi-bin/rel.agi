@@ -1,0 +1,42 @@
+#!/usr/bin/php -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+date_default_timezone_set('America/Fortaleza');
+
+$hostname = "192.168.1.60";
+$dbname = "db_cmxbsb_ceuma";
+$username = "postgres";
+$pass = "postgres";
+
+$dados = trim($argv[1]);
+echo $dados."\n";
+$var = explode("-", $dados);
+
+$id=$var[0];
+$user=$var[1];
+$dur=$var[2];
+$fila=$var[3];
+$clid=$var[4];
+$ramal=$var[5];
+$cti=$var[6];
+if ($cti=="")
+  $cti="-";
+
+$dt=time();
+
+$db_conn = pg_connect(" host = $hostname dbname = $dbname user = $username password = $pass ");
+$query = pg_query($db_conn, "INSERT  INTO public.th_recusa(uniqueid,dt_recusa,cd_agente,nu_telefone,cd_ramal,hr_duracao,sg_particionamento,sg_cifra,cti) VALUES ('$id',to_timestamp($dt),'$user','$clid',$ramal,$dur,'A','$fila','$cti');");
+echo $query."\n";
+
+if ( $query ) {
+        echo  "Record Successfully Added!";
+    }
+
+
+
+exit;
+
+?>
+

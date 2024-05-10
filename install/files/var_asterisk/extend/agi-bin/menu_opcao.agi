@@ -1,0 +1,89 @@
+#!/usr/bin/php5 -q
+<?php
+define("HOST","192.168.14.53");
+define("PORT","5432");
+define("DBASE","anatel");
+define("USER","postgres");
+define("PASS","ext!001");
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+// Funcao que conecta ao banco de dados
+
+function conectar($host, $port, $db, $usuario, $senha){
+$conn = "host=".$host." port=".$port." dbname=".$db." user=".$usuario." password=".$senha;
+$acesso = pg_connect($conn) or die("O Servidor de Banco de Dados não está disponível --> " . pg_last_error($conn)); 
+}
+
+conectar(HOST, PORT, DBASE, USER, PASS);
+write("GET VARIABLE DT_INICIAL");
+$c = read();
+$hr_inicial = substr($c,14);
+$hr_inicial = substr($hr_inicial,0,-1);
+$hr_inicial = substr($hr_inicial,0,4).'-'.substr($hr_inicial,4,2).'-'.substr($hr_inicial,6,2).' '.substr($hr_inicial,9,2).':'.substr($hr_inicial,11,2).':'.substr($hr_inicial,13,2);
+
+write("GET VARIABLE DT_FINAL");
+$c = read();
+$hr_final = substr($c,14);
+$hr_final = substr($hr_final,0,-1);
+$hr_final = substr($hr_final,0,4).'-'.substr($hr_final,4,2).'-'.substr($hr_final,6,2).' '.substr($hr_final,9,2).':'.substr($hr_final,11,2).':'.substr($hr_final,13,2);
+
+
+write("GET VARIABLE COD_MENU");
+$c = read();
+$cd_menu = substr($c,14);
+$cd_menu = substr($cd_menu,0,-1);
+
+write("GET VARIABLE COD_OPCAO");
+$c = read();
+$cd_opcao = substr($c,14);
+$cd_opcao = substr($cd_opcao,0,-1);
+
+echo "VERBOSE \"$hr_inicial\" \n";
+echo "VERBOSE \"$cd_menu\" \n";
+echo "VERBOSE \"$cd_opcao\" \n";
+
+$query = "insert into menu_opcao (dt_inicial,dt_final,cd_menu,cd_opcao) values('$hr_inicial','$hr_final','$cd_menu','$cd_opcao')";
+$query_result = pg_query($query) or die("ERRO");
+//$result = pg_fetch_result($query_result,0,'cd_campanha');
+//echo "VERBOSE \" $result \" \n";
+//echo "VERBOSE \" $result\" \n";
+//echo ("SET VARIABLE CAMP '$result'");
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

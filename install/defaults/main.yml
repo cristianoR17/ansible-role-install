@@ -1,0 +1,22 @@
+---
+# defaults file for roles/install
+ip_sip_a: "192.168.2.256"
+ip_sip_b: "192.168.2.257"
+#
+ip_bd: "192.168.2.258"
+db_name: "db_teste"
+#
+ip_share_vip: "192.168.260"
+ip_share_a: "192.168.2.261"
+ip_share_b: "192.168.2.262"
+#
+ip_web_vip: "192.168.2.263"
+#
+id_client: "333333"
+name_client: "KKKKKK"
+rota: "61"
+
+
+
+
+

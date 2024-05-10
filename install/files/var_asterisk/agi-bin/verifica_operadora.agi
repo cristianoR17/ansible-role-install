@@ -1,0 +1,98 @@
+#!/usr/bin/php5 -q
+<?php
+
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+//####################################################################################
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+write("GET VARIABLE PREFIXO");
+$c = read();
+$prefixo = substr($c,14);
+$prefixo = substr($prefixo,0,-1);
+
+echo "VERBOSE \"PREFIXO =>  $prefixo \" \n";
+
+$rota7='SIP/vono/';	
+$ddd=substr($prefixo,0,2);
+
+error_reporting (E_ALL);
+
+if ($prefixo!=''){
+
+//VERIFICA PREFIXO TIM
+  if ((substr($prefixo,2,2)=='81') ||
+      (substr($prefixo,2,2)=='82') ||
+      (substr($prefixo,2,2)=='83'))
+     $rota7 = 'SIP/1000/1';   
+	 
+//VERIFICA PREFIXO VIVO
+  if ((substr($prefixo,2,2)=='96') ||
+      (substr($prefixo,2,2)=='98') ||
+      (substr($prefixo,2,2)=='99'))
+     $rota7 = 'SIP/1000/2';   
+
+//VERIFICA PREFIXO OI
+  if ((substr($prefixo,2,2)=='84') ||
+      (substr($prefixo,2,2)=='85') ||
+      (substr($prefixo,2,2)=='86'))
+     $rota7 = 'SIP/1000/3'; 
+	
+//VERIFICA PREFIXO CLARO
+  if ((substr($prefixo,2,2)=='91') ||
+      (substr($prefixo,2,2)=='92') ||
+      (substr($prefixo,2,2)=='93') ||
+      (substr($prefixo,2,2)=='95'))
+     $rota7 = 'SIP/1000/4';
+	 
+}
+else{
+ $rota7='SIP/vono/';
+}	 
+//==========================================
+
+
+echo "VERBOSE \"PREFIXO =>  $prefixo \" \n";
+echo ("SET VARIABLE PREFIXO $prefixo \n");
+
+echo "VERBOSE \"ROTA7 =>  $rota7 \" \n";
+echo ("SET VARIABLE ROTA7 $rota7 \n");
+
+echo "VERBOSE \"DDD =>  $ddd \" \n";
+echo ("SET VARIABLE DDD $ddd \n");
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+?>

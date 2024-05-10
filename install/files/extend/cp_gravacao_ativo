@@ -1,0 +1,254 @@
+#!/usr/bin/php7.3 -q
+<?php
+//Recebe os parametros
+foreach($argv as $value)
+{
+  $link = $value;
+}
+
+function conectarSocket($servidor,$porta){
+	$con = FALSE;
+	$socket = array(
+			'ip'   => "udp://$servidor",
+			'port' => "$porta"
+	);
+	$con = fsockopen($socket["ip"], $socket["port"], $errno, $errstr, 5);
+	return $con;
+}
+
+function enviaBilhete($pacote){
+	$listaShare[] = " ";
+	if(is_file("/home/extend/comunix.conf")){
+		$listaShare=explode(";",trim(shell_exec("cat /home/extend/comunix.conf |grep -E \"share0_ip|share1_ip\"|awk -F \";\" '{print $1}'|tr '\n' ';'")));
+		foreach($listaShare as $i){
+			$i = explode("=",trim($i));
+			if(count($i) > 1){
+				$servidor = $i[1];
+				$sock = conectarSocket($servidor,"9996");
+				if(fwrite($sock,$pacote) === FALSE){
+					echo "Falha ao envia o pacote \n";
+				}else{
+					echo "Pacote enviado com sucesso \n";
+				}
+				fclose($sock);
+			}
+		}
+	}else{
+		array_pop($listaShare);
+		array_push($listaShare,file("/home/extend/share0_ip"));
+		array_push($listaShare,file("/home/extend/share1_ip"));
+		if(count($listaShare) > 0){
+			foreach($listaShare as $i){
+				$servidorShare = trim(str_ireplace(',', '', $i[0]));
+				$sock = conectarSocket($servidorShare,"9996");
+				if(fwrite($sock,$pacote) === FALSE){
+					echo "Falha ao envia o pacote \n";
+				}else{
+					echo "Pacote enviado com sucesso \n";
+				}
+				fclose($sock);
+			}
+		}
+	}
+}
+
+function infoWAV($dirGrav){
+	
+	$query = '';
+	
+	$fileGrav = str_ireplace(".WAV", "", $dirGrav);
+	$nomeArquivo = explode("/", $fileGrav);
+	$qtd = count($nomeArquivo);
+	$dirData = $nomeArquivo[$qtd -2];
+	$nome = $nomeArquivo[$qtd -1];
+	
+	$uniqueID = substr($nome, 0,12).".".substr($nome, 12);
+	
+	$insert = "INSERT INTO th_sox_information_wav (uniqueid,nu_bits_sample,nu_channels,nu_samples,nu_sample_rate,nu_duration,nm_bit_rate,nm_audio_encoding,nu_file_size) ";
+	$bits_sample = trim(shell_exec("soxi -b $dirGrav"));
+	$channels = trim(shell_exec("soxi -c $dirGrav"));
+	$samples = trim(shell_exec("soxi -s $dirGrav"));
+	$sample_rate = trim(shell_exec("soxi -r $dirGrav"));
+	$duration = trim(shell_exec("soxi -D $dirGrav"));
+	$bit_rate = trim(shell_exec("soxi -B $dirGrav"));
+	$encoding = trim(shell_exec("soxi -e $dirGrav"));
+	$file_size = trim(shell_exec("ls -l $dirGrav|awk -F \" \" '{print $5}'"));
+	
+	if(strlen($uniqueID) > 0 && strlen($bits_sample) > 0 && strlen($channels) > 0 &&
+	strlen($samples) > 0 && strlen($sample_rate) && strlen($duration) > 0 &&
+	strlen($bit_rate) > 0 && strlen($encoding) > 0){
+	
+		$insert .= "VALUES('$uniqueID','$bits_sample','$channels','$samples','$sample_rate','$duration','$bit_rate','$encoding','$file_size');";
+		echo $insert."\n";
+		$query = $insert;
+	
+	}else{
+		echo "Erro \n";
+		echo "RST $uniqueID $bits_sample $channels $samples $sample_rate $duration $bit_rate $encoding $file_size\n";
+	}
+	
+	return $query;
+}
+
+function enviaLocal($link,$destino,$remove){
+	
+	$rst = 1;
+	
+	$nome = explode("/",$link);
+	$qtd = count($nome);
+	$dirData = $nome[$qtd -2];
+	$arquivo = $nome[$qtd -1];
+	
+	echo "Listando o diretorio $destino$dirData .\n";
+	system("test -d $destino$dirData",$rst);
+	if($rst != 0){
+		echo "Criando o diretorio $destino$dirData \n";
+		system("mkdir -m 0777 $destino$dirData");
+		//system("mkdir $destino$dirData");
+	}
+	$destino = $destino.$dirData."/".$arquivo;
+	echo "Copiando o arquivo $link para ".$destino."\n";
+	system("cp $link $destino",$rst);
+	if($nome[1] == "dev" && $rst == 0){
+		if($remove == 1){
+			echo "Removendo arquivo da memoria. \n";
+			system("rm $link",$rst);
+		}	
+	}
+	
+}
+
+function checkUra($link){
+	
+	$nomeArquivo = explode("/", $link);
+	$qtd = count($nomeArquivo);
+	$nome = $nomeArquivo[$qtd -1];
+	$ura = substr($nome,0,2);
+	
+	return $ura;
+	
+}
+
+function procuraFtp($ura,$listaUra){
+	/*
+	 * Procura a ura na lista de ftp
+	 * retornando a posicao da ura no array
+	 */
+	$numUra = -1;
+	
+	for($i=1;$i<count($listaUra);$i++){
+		$lista = explode(",",trim($listaUra[$i]));
+		if(substr($lista[0],3,2) == $ura){
+			return $numUra = $i;
+		}
+	}
+	return $numUra;
+	
+	
+}
+
+function checkDir($dir, $conexao){
+
+	$rst = false;
+	$lista = ftp_nlist($conexao, ".");
+	foreach ($lista as $l){
+		if($dir == $l){
+			$rst = true;
+			return $rst;
+		}
+	}
+	return $rst;
+}
+
+function enviaFtp($servidor,$usuario,$senha,$link){
+	
+	$nomeArquivo = explode("/", $link);
+	$qtd = count($nomeArquivo);
+	$dirData = $nomeArquivo[$qtd -2];
+	$nome = $nomeArquivo[$qtd -1];
+	$envia = 0;
+	
+	// conectando ao servidor
+	$con = ftp_connect($servidor);
+	
+	if($con){
+		echo "Conexao ok \n";
+		$rstLogin = ftp_login($con, $usuario, $senha);
+		if($rstLogin){
+			echo "Login efetuado com sucesso. \n";
+			//Verificando se o diretorio existe
+			if(checkDir($dirData, $con)){
+				echo "Diretorio encontrado $dirData .\n";
+				$envia = 1;
+			}else{
+				//Criando o diretorio do dia
+				if(ftp_mkdir($con, $dirData)){
+					echo "Diretorio criado com sucesso. \n";
+					$envia = 1;
+				}else{
+					echo "Error ao criar o diretorio. \n";
+				}
+			}
+			if($envia == 1){
+				//Alocando espaco para efetuar o upload.
+				if(ftp_alloc($con, filesize($link), $result)){
+				  echo "Espaco alocado com sucesso no servidor.  Arquivo : $link Tamanho : ".filesize($link)." \n";
+				  //Fazendo upload do arquivo.
+				  if(ftp_put($con, "$dirData/$nome", $link, FTP_BINARY)){
+				  		echo "Arquivo enviado com sucesso. \n";
+				  		enviaBilhete(infoWAV($link));
+				  }else{
+				  		echo "Erro ao enviar o arquivo $dirData/$nome $usuario $ip \n";
+				  }
+				}else{
+					echo "Nao foi possivel alocar espaco no servidor. $result\n";
+				}
+			}
+			
+		}else{
+			echo "Erro ao efetuar o Login. \n";
+		}
+	}
+	ftp_close($con);
+}
+
+/*Fazendo o envio do arquivo via ftp
+ * O arquivo deve estar nesse formato:
+ 
+ 	;uraXX,usuario,ip
+	ura00,uraftp00,192.168.0.20X
+	ura01,uraftp01,192.168.0.20X
+	ura02,uraftp02,192.168.0.20X
+	ura03,uraftp03,192.168.0.20X
+	ura04,uraftp04,192.168.0.20X
+	ura05,uraftp05,192.168.0.20X
+*/
+
+if($listaUra = file("/home/extend/servidores_ftp")){
+	
+	if(count($listaUra) > 1){
+		$ura = checkUra($link);
+		$posicao = procuraFtp($ura,$listaUra);
+		if($posicao > 0){
+			
+			$acesso = explode(",", trim($listaUra[$posicao]));
+			$ura = $acesso[0];
+			$usuario = $acesso[1];
+			$ip = $acesso[2];
+			$senha = "uraftp";
+			enviaFtp($ip,$usuario,$senha,$link);
+			
+		}else{
+			echo "Nao foi encontrado usuario na lista das ura $link \n";
+		}
+		
+	}
+}else{
+	echo "Falha ao ler o arquivo dos servidores em /home/extend/servidores_ftp. \n";
+}
+
+$dest0 = '/home/gravacoes/ativo/';
+//Fazendo o envio para o diretorio local
+enviaLocal($link,$dest0,1);//(o parametro 0 nao remove da memoria)
+
+?>

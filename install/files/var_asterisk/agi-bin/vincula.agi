@@ -1,0 +1,363 @@
+#!/usr/bin/php4 -q
+<?php
+
+require('nusoap.php');
+
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+function xmlize ($data, $WHITE=1) {
+
+    $data = trim($data);
+    $vals = $index = $array = array();
+    $parser = xml_parser_create();
+    xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+    xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, $WHITE);
+    xml_parse_into_struct($parser, $data, $vals, $index);
+    xml_parser_free($parser);
+
+    $i = 0; 
+
+    $tagname = $vals[$i]['tag'];
+    if ( isset ($vals[$i]['attributes'] ) )
+    {
+        $array[$tagname]['@'] = $vals[$i]['attributes'];
+    } else {
+        $array[$tagname]['@'] = array();
+    }
+
+    $array[$tagname]["#"] = xml_depth($vals, $i);
+
+    return $array;
+}
+
+function xml_depth($vals, &$i) { 
+    $children = array(); 
+
+    if ( isset($vals[$i]['value']) )
+    {
+        array_push($children, $vals[$i]['value']);
+    }
+
+    while (++$i < count($vals)) { 
+
+        switch ($vals[$i]['type']) { 
+
+           case 'open': 
+
+                if ( isset ( $vals[$i]['tag'] ) )
+                {
+                    $tagname = $vals[$i]['tag'];
+                } else {
+                    $tagname = '';
+                }
+
+                if ( isset ( $children[$tagname] ) )
+                {
+                    $size = sizeof($children[$tagname]);
+                } else {
+                    $size = 0;
+                }
+
+                if ( isset ( $vals[$i]['attributes'] ) ) {
+                    $children[$tagname][$size]['@'] = $vals[$i]["attributes"];
+                }
+
+                $children[$tagname][$size]['#'] = xml_depth($vals, $i);
+
+            break; 
+
+
+            case 'cdata':
+                array_push($children, $vals[$i]['value']); 
+            break; 
+
+            case 'complete': 
+                $tagname = $vals[$i]['tag'];
+
+                if( isset ($children[$tagname]) )
+                {
+                    $size = sizeof($children[$tagname]);
+                } else {
+                    $size = 0;
+                }
+
+                if( isset ( $vals[$i]['value'] ) )
+                {
+                    $children[$tagname][$size]["#"] = $vals[$i]['value'];
+                } else {
+                    $children[$tagname][$size]["#"] = '';
+                }
+
+                if ( isset ($vals[$i]['attributes']) ) {
+                    $children[$tagname][$size]['@']
+                                             = $vals[$i]['attributes'];
+                }			
+
+            break; 
+
+            case 'close':
+                return $children; 
+            break;
+        } 
+
+    } 
+
+	return $children;
+
+}
+
+
+function traverse_xmlize($array, $arrName = "array", $level = 0) {
+
+    foreach($array as $key=>$val)
+    {
+        if ( is_array($val) )
+        {
+            traverse_xmlize($val, $arrName . "[" . $key . "]", $level + 1);
+        } else {
+            $GLOBALS['traverse_array'][] = '$' . $arrName . '[' . $key . '] = "' . $val . "\"\n";
+        }
+    }
+
+    return 1;
+}
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+
+//Captura CPF 
+write("GET VARIABLE CPF");
+$c = read();
+$vetor[0] = substr($c,14);
+$vetor[0] = substr($vetor[0],0,-1);
+
+//Captura ID REGIAO 
+write("GET VARIABLE IDREGIAO");
+$c = read();
+$vetor[1] = substr($c,14);
+$vetor[1] = substr($vetor[1],0,-1);
+
+
+//Captura TELEFONE 
+write("GET VARIABLE TELEFONE");
+$c = read();
+$vetor[2] = substr($c,14);
+$vetor[2] = substr($vetor[2],0,-1);
+
+
+//Captura CEP 
+write("GET VARIABLE CEP");
+$c = read();
+$vetor[3] = substr($c,14);
+$vetor[3] = substr($vetor[3],0,-1);
+
+echo "VERBOSE \"CPF: $vetor[0]\" \n";
+echo "VERBOSE \"ID_REGIAO: $vetor[1]\" \n";
+echo "VERBOSE \"TELEFONE: $vetor[2]\" \n";
+echo "VERBOSE \" CEP: $vetor[3]\" \n";
+
+
+        $wcClient  = new soapclient('http://200.252.150.7/UraOS/Ura?WSDL','wsdl');
+        $Response = $wcClient->call('vinculaDistribuicaoCPF', $vetor/*array($msg)*/); 
+        if ($wcClient->getError()) {
+            $descricaoResposta = "FALHA MF DETRAN";
+        }
+        else {
+            $xResponse = xmlize($Response);
+            $dados = $xResponse["saida"]["#"];
+
+           // if ($dados["descricao-reposta"]['0']['#']=="")
+           //   $descricaoResposta = "FALHA";
+           // else
+             $descricaoResposta = $dados["descricao-reposta"]['0']['#'];
+             //$dados = $dados["dados"]['0']["#"]; 
+             $codRetorno=($dados["cod-retorno"]['0']['#']);  
+             $codClinica=($dados["cod-clinica"]['0']['#']);  
+             $diasValidade=($dados["dias-validade"]['0']['#']);
+
+       }
+
+ if ($codClinica==28)
+  $codMsg = 'M_03443';
+ if ($codClinica==30)
+  $codMsg = 'M_03444';
+ if ($codClinica==48)
+   $codMsg = 'M_03445';
+ if ($codClinica==27)
+   $codMsg = 'M_03446';
+ if ($codClinica==16)
+   $codMsg = 'M_03447';
+ if ($codClinica==191)
+   $codMsg = 'M_03448';
+ if ($codClinica==302)
+   $codMsg = 'M_03449';
+ if ($codClinica==68)
+   $codMsg = 'M_03450';
+ if ($codClinica==299)
+   $codMsg = 'M_03451';
+ if ($codClinica==60)
+   $codMsg = 'M_03452';
+ if ($codClinica==108)
+   $codMsg = 'M_03453';
+ if ($codClinica==531)
+   $codMsg = 'M_03454';
+ if ($codClinica==43)
+   $codMsg = 'M_03455';
+ if ($codClinica==72)
+   $codMsg = 'M_03456';
+ if ($codClinica==311)
+   $codMsg = 'M_03457';
+ if ($codClinica==52)
+   $codMsg = 'M_03458';
+ if ($codClinica==76)
+   $codMsg = 'M_03459';
+ if ($codClinica==74)
+   $codMsg = 'M_03460';
+ if ($codClinica==56)
+   $codMsg = 'M_03461';
+ if ($codClinica==12)
+   $codMsg = 'M_03462';
+ if ($codClinica==10)
+   $codMsg = 'M_03463';
+ if ($codClinica==400)
+   $codMsg = 'M_03464';
+ if ($codClinica==221)
+   $codMsg = 'M_03465';
+ if ($codClinica==46)
+   $codMsg = 'M_03467';
+ if ($codClinica==66)
+   $codMsg = 'M_03468';
+ if ($codClinica==426)
+   $codMsg = 'M_03469';
+ if ($codClinica==80)
+   $codMsg = 'M_03470';
+ if ($codClinica==581)
+   $codMsg = 'M_03471';
+ if ($codClinica==44)
+   $codMsg = 'M_03472';
+ if ($codClinica==256)
+   $codMsg = 'M_03473';
+ if ($codClinica==51)
+   $codMsg = 'M_03474';
+ if ($codClinica==35)
+   $codMsg = 'M_03475';
+ if ($codClinica==141)
+   $codMsg = 'M_03476';
+ if ($codClinica==94)
+   $codMsg = 'M_03477';
+ if ($codClinica==70)
+   $codMsg = 'M_03478';
+ if ($codClinica==541)
+   $codMsg = 'M_03479';
+ if ($codClinica==24)
+   $codMsg = 'M_03480';
+ if ($codClinica==26)
+   $codMsg = 'M_03481';
+ if ($codClinica==418)
+   $codMsg = 'M_03482';
+ if ($codClinica==18)
+   $codMsg = 'M_03483';
+ if ($codClinica==540)
+   $codMsg = 'M_03484';
+ if ($codClinica==132)
+   $codMsg = 'M_03485';
+ if ($codClinica==183)
+   $codMsg = 'M_03487';
+ if ($codClinica==32)
+   $codMsg = 'M_03488';
+ if ($codClinica==64)
+   $codMsg = 'M_03489';
+ if ($codClinica==542)
+   $codMsg = 'M_03490';
+ if ($codClinica==50)
+   $codMsg = 'M_03491';
+ if ($codClinica==40)
+   $codMsg = 'M_03492';
+ if ($codClinica==264)
+   $codMsg = 'M_03493';
+ if ($codClinica==281)
+   $codMsg = 'M_03494';
+ if ($codClinica==230)
+   $codMsg = 'M_03495';
+ if ($codClinica==272)
+   $codMsg = 'M_03496';
+ if ($codClinica==58)
+   $codMsg = 'M_03497';
+ if ($codClinica==361)
+   $codMsg = 'M_03498';
+ if ($codClinica==62)
+   $codMsg = 'M_03499';
+ if ($codClinica==205)
+   $codMsg = 'M_03500';
+ if ($codClinica==82)
+   $codMsg = 'M_03562';
+ if ($codClinica==88)
+   $codMsg = 'M_03563';
+ if ($codClinica==90)
+   $codMsg = 'M_03603';
+ if ($codClinica==92)
+   $codMsg = 'M_03602';
+
+
+
+echo ("SET VARIABLE CODRETORNO  \"$codRetorno\" \n");
+echo ("SET VARIABLE CODCLINICA  \"$codClinica\" \n");
+
+
+echo ("SET VARIABLE CODMSG  \"$codMsg\" \n");
+ 
+$inexistentes = 1;
+$inexistenten = 0;
+
+//Veiculo inexistente
+if (substr($descricaoResposta,4,11) == "Inexistente") 
+ echo ("SET VARIABLE INEXISTENTE  \"$inexistentes\" \n");
+else
+ echo ("SET VARIABLE INEXISTENTE  \"$inexistenten\" \n");
+//Falha na consulta
+
+$falhas = 1;
+$falhan = 0;
+
+if (substr($descricaoResposta,0,5) == "FALHA")
+ echo ("SET VARIABLE FALHA  \"$falhas\" \n");
+else
+ echo ("SET VARIABLE FALHA  \"$falhan\" \n");
+echo "VERBOSE \"$descricaoResposta\" \n";
+echo "VERBOSE \"COD_RETORNO: $codRetorno\"\n";
+echo "VERBOSE \"COD_CLINICA: $codClinica\"\n";
+echo "VERBOSE \"QTD_DIAS: $diasValidade\"\n";
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>

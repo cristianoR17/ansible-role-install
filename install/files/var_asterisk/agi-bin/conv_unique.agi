@@ -1,0 +1,20 @@
+#!/usr/bin/php5 -q
+<?php
+
+$unique = $argv[1];
+//$unique = echo("GET VARIABLE UNIQUEID");
+
+function converte($unique) {
+
+  $nomes = explode('.',$unique); 
+  $novo = $nomes[0].$nomes[1];
+
+  return $novo;
+}
+
+$novo_unique = converte($unique);
+
+echo ("SET VARIABLE NEW_UNIQUEID $novo_unique");
+
+?>
+

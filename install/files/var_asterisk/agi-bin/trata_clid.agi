@@ -1,0 +1,62 @@
+#!/usr/bin/php5 -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+write("GET VARIABLE EXTEN");
+$c = read();
+$nr = substr($c,14);
+$nr = substr($nr,0,-1);
+
+$codcp = 0;
+
+$pos=strpos($nr,'-');
+if ($pos>0) {
+
+$codcp = 1;
+$nr=substr($nr,0,$pos);
+
+}
+echo "VERBOSE \"NR $nr\" \n";
+echo ("SET VARIABLE NR $nr");
+
+echo "VERBOSE \"CODCP $codcp\" \n";
+echo ("SET VARIABLE CODCP $codcp");
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+
+?>
+

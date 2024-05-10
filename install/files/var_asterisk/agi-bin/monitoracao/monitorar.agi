@@ -1,0 +1,188 @@
+#!/usr/bin/php7.3 -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0);
+
+function monitoracaoLog($dados){
+        $dia = date('Y-m-d');
+        $hora = date('H:i:s');
+        shell_exec("mkdir -p /var/log/monitoracao/$dia");
+        if(is_dir("/var/log/monitoracao/$dia")){
+                $arquivo = fopen("/var/log/monitoracao/$dia/monitoracao.log","a+");
+                if (flock($arquivo, LOCK_EX)) { // faca um lock exclusivo
+                        fwrite($arquivo, "LOG=$dia-$hora;$dados\n");
+                        flock($arquivo, LOCK_UN); // libera o lock
+                }else{
+                        echo "VERBOSE \"Nao pode travar o arquivo\"\n";
+                }
+                fclose($arquivo);
+        }else{
+                echo "VERBOSE \"Falha ao o dir de log\"\n";
+        }
+}
+
+function getIp($letra){
+        $tipos = array('a','b','c','d','e','f','g','h');
+        $ip = 0;
+        foreach($tipos as $tipo){
+                $valor='';
+                $valor =trim(shell_exec("php /var/lib/asterisk/agi-bin/monitoracao/getIni.php general sip_$tipo valor"));
+                if(strlen($valor) > 0){
+                        if($letra == $tipo){
+                                return $valor;
+                        }
+                }
+        }
+        return $ip;
+}
+
+function monitorar($srvOp,$ramalOp,$srvSup,$ramalSup){
+
+        ini_set("auto_detect_line_endings", true);
+        $servidor = $srvOp;
+
+        $socket = fsockopen($servidor,"5038", $errno, $errstr, 5);
+        fputs($socket,"Action: Login\r\n");
+        fputs($socket,"UserName: monitoracao\r\n");
+        fputs($socket,"Secret: monitoracao123\r\n\r\n");
+
+        fputs($socket,"Action: Originate\r\n");
+        fputs($socket,"Channel: Local/*1003=$ramalOp@monitoracao\r\n");
+        fputs($socket,"Context: monitoracao\r\n");
+        fputs($socket,"Exten: *1005=$ramalSup=$srvSup\r\n");
+        fputs($socket,"Priority: 1\r\n");
+        fputs($socket,"Async: True\r\n\r\n");
+
+        fputs($socket,"Action: Logoff\r\n\r\n");
+        $i = 0;
+        $rst = false;
+        $resp='';
+        while($i < 500){
+                $jow[]= fgets($socket,128);
+                //print_r($jow);
+                $i++;
+                foreach($jow as $r){
+                        $r = trim(str_replace("\n","",$r));
+                        if($r == "Event: OriginateResponse"){
+                                $resp .= $r;
+
+                        }
+                }
+        }
+        fclose($socket);
+        return;
+
+}
+
+function intercalar($srvOp,$ramalOp,$srvSup,$ramalSup){
+
+        ini_set("auto_detect_line_endings", true);
+        $servidor = $srvOp;
+
+        $socket = fsockopen($servidor,"5038", $errno, $errstr, 5);
+        fputs($socket,"Action: Login\r\n");
+        fputs($socket,"UserName: monitoracao\r\n");
+        fputs($socket,"Secret: monitoracao123\r\n\r\n");
+
+        fputs($socket,"Action: Originate\r\n");
+        fputs($socket,"Channel: Local/*1003=$ramalOp@intercalar\r\n");
+        fputs($socket,"Context: intercalar\r\n");
+        fputs($socket,"Exten: *1005=$ramalSup=$srvSup\r\n");
+        fputs($socket,"Priority: 1\r\n");
+        fputs($socket,"Async: True\r\n\r\n");
+
+        fputs($socket,"Action: Logoff\r\n\r\n");
+        $i = 0;
+        $rst = false;
+        $resp='';
+        while($i < 500){
+                $jow[]= fgets($socket,128);
+                //print_r($jow);
+                $i++;
+                foreach($jow as $r){
+                        $r = trim(str_replace("\n","",$r));
+                        if($r == "Event: OriginateResponse"){
+                                $resp .= $r;
+
+                        }
+                }
+        }
+        fclose($socket);
+        return;
+
+}
+
+function consultar($srvOp,$ramalOp,$srvSup,$ramalSup){
+
+        ini_set("auto_detect_line_endings", true);
+        $servidor = $srvOp;
+
+        $socket = fsockopen($servidor,"5038", $errno, $errstr, 5);
+        fputs($socket,"Action: Login\r\n");
+        fputs($socket,"UserName: monitoracao\r\n");
+        fputs($socket,"Secret: monitoracao123\r\n\r\n");
+
+        fputs($socket,"Action: Originate\r\n");
+        fputs($socket,"Channel: Local/*1003=$ramalOp@consultar\r\n");
+        fputs($socket,"Context: consultar\r\n");
+        fputs($socket,"Exten: *1005=$ramalSup=$srvSup\r\n");
+        fputs($socket,"Priority: 1\r\n");
+        fputs($socket,"Async: True\r\n\r\n");
+
+        fputs($socket,"Action: Logoff\r\n\r\n");
+        $i = 0;
+        $rst = false;
+        $resp='';
+        while($i < 500){
+                $jow[]= fgets($socket,128);
+                //print_r($jow);
+                $i++;
+                foreach($jow as $r){
+                        $r = trim(str_replace("\n","",$r));
+                        if($r == "Event: OriginateResponse"){
+                                $resp .= $r;
+
+                        }
+                }
+        }
+        fclose($socket);
+        return;
+
+}
+
+$exten = trim($argv[1]);
+
+if(strlen($exten) > 0 ){
+	$context = substr($exten,1,4);
+        $srvOp = strtolower(substr($exten,5,1));
+        $srvOp = getIp($srvOp);
+        $ramalOp = substr($exten,6,4);
+        $srvSup = strtoupper(substr($exten,10,1));
+        //$srvSup = getIp($srvSup);
+	$srvSup = "CTI$srvSup";
+        $ramalSup = substr($exten,11,4);
+        if(strlen($srvOp) > 1 && strlen($srvSup) > 1 ){
+		switch($context){
+			case 1002:
+                		echo "Monitoracao: \n";
+                		monitorar($srvOp,$ramalOp,$srvSup,$ramalSup);
+				break;
+			case 1003:
+                		echo "Intercalar: \n";
+                		intercalar($srvOp,$ramalOp,$srvSup,$ramalSup);
+				break;
+			case 1004:
+                		echo "Consultar: \n";
+                		consultar($srvOp,$ramalOp,$srvSup,$ramalSup);
+				break;
+		}
+                echo "Operador - Srv: $srvOp Ramal: $ramalOp\n";
+               	echo "Supervisor - Srv: $srvSup Ramal:$ramalSup\n";
+		echo "VERBOSE \"Operador : $srvOp-$ramalOp Supervisor : $srvSup-$ramalSup \" \n";
+		monitoracaoLog($exten);
+        }
+}
+
+exit;
+?>

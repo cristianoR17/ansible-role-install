@@ -1,0 +1,111 @@
+#!/usr/bin/php5 -q
+<?php
+
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0); 
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+
+//####################################################################################
+
+// Habilita modo debugging (mais verbose)
+$debug = true;
+
+// Do function definitions before we start the main loop
+function read() {
+  global $in, $debug, $stdlog;
+  $input = str_replace("\n", "", fgets($in, 4096));
+  if ($debug) fputs($stdlog, "read: $input\n");
+  return $input;
+}
+
+function write($line) {
+  global $debug, $stdlog;
+  if ($debug) fputs($stdlog, "write: $line\n");
+  echo $line."\n";
+}
+
+// Coloca os headers AGI dentro de um array
+while ($env=read()) {
+  $s = split(": ",$env);
+  $agi[str_replace("agi_","",$s[0])] = trim($s[1]);
+  if (($env == "") || ($env == "\n")) {
+    break;
+  }
+}
+
+
+
+error_reporting (E_ALL);
+
+
+
+
+//lê todo o arquivo .txt
+$lista = file("/bloqueio.txt");
+$periodo = '00:00-00:00';
+$dia = 30;
+$mes = 2;
+
+$separa = explode("|", $lista[0]);
+    $periodo = ($separa[0]);
+	$dia = ($separa[1]);
+	$mes = ($separa[2]);
+          
+       
+
+if ($mes == 1)
+	$mes = 'jan';
+	
+if ($mes == 2)
+	$mes = 'feb';
+
+if ($mes == 3)
+	$mes = 'mar';
+
+if ($mes == 4)
+	$mes = 'apr';	
+
+if ($mes == 5)
+	$mes = 'may';	
+
+if ($mes == 6)
+	$mes = 'jun';	
+
+if ($mes == 7)
+	$mes = 'jul';	
+
+if ($mes == 8)
+	$mes = 'aug';	
+
+if ($mes == 9)
+	$mes = 'sep';	
+
+if ($mes == 10)
+	$mes = 'oct';	
+
+if ($mes == 11)
+	$mes = 'nov';
+
+if ($mes == 12)
+	$mes = 'dec';	
+
+//==========================================
+
+
+echo "VERBOSE \"MES =>  $mes \" \n";
+echo ("SET VARIABLE MES $mes \n");
+
+echo "VERBOSE \"PERIODO =>  $periodo \" \n";
+echo ("SET VARIABLE PERIODO $periodo \n");
+
+echo "VERBOSE \"DIA =>  $dia \" \n";
+echo ("SET VARIABLE DIA $dia \n");
+
+
+fclose($in);
+fclose($stdlog);
+exit;
+?>
