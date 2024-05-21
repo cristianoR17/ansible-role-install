@@ -15,6 +15,13 @@ ip_web_vip: "192.168.2.263"
 id_client: "333333"
 name_client: "KKKKKK"
 rota: "61"
+#
+ip_ura_00: "192.1.1.1"
+ip_ura_01: "192.1.1.2"
+ip_ura_gw: "192.1.1.3"
+ip_sip_00: "192.1.1.4"
+ip_sip_01: "192.1.1.5"
+
 
 
 
