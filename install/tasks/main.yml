@@ -81,10 +81,15 @@
     state: directory
     mode: '0644'
 
-- name: Genereation template
+- name: Genereation template comunix.conf
   template:
     src: comunix.conf
     dest: /home/extend/  
+
+- name: Genereation template pjsip
+  template:
+    src: pjsip.conf
+    dest: /etc/asterisk/
 
 - name: Stop asterisk
   ansible.builtin.command: /etc/init.d/asterisk stop
