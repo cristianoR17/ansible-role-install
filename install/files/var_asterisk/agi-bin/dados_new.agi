@@ -5,7 +5,6 @@ set_time_limit(6);
 error_reporting(0); 
 
 $dados = trim($argv[1]);
-$cti = trim($argv[2]);
 
 $var = explode("-", $dados);
 
@@ -14,42 +13,50 @@ if (($var[0]!="") && ($var[1]!="") && ($var[2]!="") && ($var[3]!="") && ($var[4]
 else
  $result=0;
 
+$busy=time();
+$ring=time();
+
+//1616678084,61999685009,q1005,391616678075.21,0,
+$ramal_busy=$var[0]."_busy";
+$busy=system("cat /dev/shm/$ramal_busy"); 
+$v=explode(",",$busy);
+$busy=time()-$v[0];
+
+$ramal_ring=$var[0]."_ringing";
+$ring=system("cat /dev/shm/$ramal_ring");
+$v=explode(",",$ring);
+$ring=time()-$v[0];
+
 $now=time();
 $ramal=$var[0]."_pos";
 system("echo '$now,' > /dev/shm/$ramal");
 
-$busy=time();
-$ramal_busy=$var[0]."_busy";
-$busy=system("cat /dev/shm/$ramal_busy");
-$v=explode(",",$busy);
-$busy=time()-$v[0];
+$ramal=$var[0]."_ringing";
+system("echo '$now,' > /dev/shm/$ramal");
 
-if ($busy<5)
- $var[0]="0";
 
-$ramal=$var[0]."_cti";
-system("echo '$cti,' > /dev/shm/$ramal");
+
 
 echo ("SET VARIABLE RESULT  \"$result\" \n");
 echo ("SET VARIABLE RAMAL  \"$var[0]\" \n");
 echo ("SET VARIABLE CLID  \"$var[1]\" \n");
 echo ("SET VARIABLE ID  \"$var[2]\" \n");
 echo ("SET VARIABLE FILA  \"$var[3]\" \n");
-echo ("SET VARIABLE CTI  \"$cti\" \n");
+echo ("SET VARIABLE CTI  \"$var[4]\" \n");
 echo ("SET VARIABLE USER  \"$var[5]\" \n");
 echo ("SET VARIABLE DUR  \"$var[6]\" \n");
 echo ("SET VARIABLE URA  \"$var[7]\" \n");
 echo ("SET VARIABLE DT_GRAV  \"$var[8]-$var[9]-$var[10]\" \n");
 echo ("SET VARIABLE CHANNEL_ID  \"$var[11]\" \n");
 echo ("SET VARIABLE SITE  \"$var[12]\" \n");
-echo ("SET VARIABLE BUSY  \"$busy\" \n");
 
+echo ("VERBOSE \"RES: $res\" \n");
 echo ("VERBOSE \"RESULT: $result\" \n");
 echo ("VERBOSE \"RAMAL: $var[0]\" \n");
 echo ("VERBOSE \"CLID: $var[1]\" \n");
 echo ("VERBOSE \"ID: $var[2]\" \n");
 echo ("VERBOSE \"FILA: $var[3]\" \n");
-echo ("VERBOSE \"CTI: $cti\" \n");
+echo ("VERBOSE \"CTI: $var[4]\" \n");
 echo ("VERBOSE \"USER: $var[5]\" \n");
 echo ("VERBOSE \"DUR_QUEUE: $var[6]\" \n");
 echo ("VERBOSE \"URA: $var[7]\" \n");
@@ -58,6 +65,8 @@ echo ("VERBOSE \"CHANNEL_ID: $var[11]\" \n");
 echo ("VERBOSE \"SITE: $var[12]\" \n");
 echo ("VERBOSE \"RAMAL_IP: $ip\" \n");
 echo ("VERBOSE \"BUSY: $busy\" \n");
+echo ("VERBOSE \"RING: $ring\" \n");
+
 exit;
 
 ?>

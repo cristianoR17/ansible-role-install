@@ -1,4 +1,4 @@
 rota-;-posicao_range-;-range-;-remover_digito-;-rota
-0;1;1-9;1;PJSIP/6;@GWCLIENTES00
-00;4;1-9;4;PJSIP/6014;@GWCLIENTES00
+0;1;1-9;1;PJSIP/0;@URA00
+00;4;1-9;4;PJSIP/0014;@URA00
 

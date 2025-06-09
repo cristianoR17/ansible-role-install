@@ -22,7 +22,7 @@
 #
 # m h  dom mon dow   command 
 
-00 3 * * * /home/extend/scripts/scriptBackup_v8.4.sh
+00 3 * * * /home/extend/scripts/scriptBackup_v8.5.sh
 00 2 * * * /home/extend/scripts/backup_insert_v4.sh -d 2
 
 

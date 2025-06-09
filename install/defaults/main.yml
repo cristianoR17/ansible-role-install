@@ -1,26 +1,35 @@
 ---
 # defaults file for roles/install
-ip_sip_a: "192.168.9.216"
-ip_sip_b: "192.168.9.217"
+ip_sip_a: "192.168.10.210"
+ip_sip_b: "192.168.10.211"
+ip_sip_c: "1.1.1.1"
+ip_sip_d: "1.1.1.2"
 #
-ip_bd: "192.168.9.76"
-db_name: "db_cmxbsb_cntc_tcu"
+ip_bd: "192.168.10.212"
+db_name: "db_manager_sfiecce"
 #
-ip_share_vip: "192.168.9.86"
-ip_share_a: "192.168.9.78"
-ip_share_b: "192.168.9.79"
+ip_share_vip: "192.168.10.209"
+ip_share_a: "192.168.10.214"
+ip_share_b: "192.168.10.215"
 #
-ip_web_vip: "192.168.9.75"
+ip_web_vip: "192.168.10.151"
 #
-id_client: "3cdb0f1ef1bb093971e05addf218383c"
-name_client: "TCU"
+id_client: "c56a57d3aaef98ee9bb9722806869d48"
+name_client: "SFIEC"
 rota: "61"
 #
-ip_ura_00: "192.168.9.82"
-ip_ura_01: "192.168.9.83"
-ip_ura_gw: "192.168.0.86"
-ip_sip_00: "192.168.9.216"
-ip_sip_01: "192.168.9.217"
+ip_ura_00: "192.168.10.218"
+ip_ura_01: "192.168.10.219"
+ip_ura_02: "1.1.1.1"
+ip_ura_03: "1.1.1.1"
+ip_ura_04: "1.1.1.1"
+ip_sip_00: "192.168.10.210"
+ip_sip_01: "192.168.10.211"
+ip_sip_02: "1.1.1.1"
+ip_sip_03: "1.1.1.1"
+
+vl_sip: "A"
+
 
 
 

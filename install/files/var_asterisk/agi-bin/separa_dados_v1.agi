@@ -1,0 +1,28 @@
+#!/usr/bin/php -q
+<?php
+ob_implicit_flush(true);
+set_time_limit(6);
+error_reporting(0);
+$in = fopen("php://stdin","r");
+$stdlog = fopen("/var/log/asterisk/agi.log", "w");
+
+$debug = true;
+$exten = $argv[1];
+$exten = str_replace("free","0",$exten);
+$dados = explode('-',$exten);
+$cti = $dados[1];
+$dados[1] = 0;
+
+$unqueid_trans = $dados[3];
+$unqueid_trans = substr($unqueid_trans,2);
+$dados[3] = $unqueid_trans;
+
+$dados = implode('-',$dados);
+
+echo "VERBOSE \"GetContaRamal => $dados \" \n";
+echo ("SET VARIABLE GetContaRamal $dados \n");
+echo ("SET VARIABLE CTI $cti \n");
+
+exit;
+?>
+
